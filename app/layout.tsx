@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Playfair_Display } from "next/font/google";
 import "./globals.css";
+import Script from "next/script";
+import { SaaSMakerFeedback } from "../components/saasmaker-feedback";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -84,6 +86,13 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} antialiased`}
       >
         {children}
+        <SaaSMakerFeedback />
+        <Script
+          src="https://unpkg.com/@saas-maker/analytics-sdk@0.2.0/dist/index.global.js"
+          data-project={process.env.NEXT_PUBLIC_SAASMAKER_API_KEY}
+          data-api="https://api.sassmaker.com"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
