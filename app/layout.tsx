@@ -21,7 +21,7 @@ const playfair = Playfair_Display({
   weight: ["700"],
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://openhistoria.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://open-historia.vercel.app";
 
 export const metadata: Metadata = {
   title: {
