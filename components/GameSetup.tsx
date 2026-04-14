@@ -11,7 +11,7 @@ interface GameSetupProps {
   preset?: { year: number; scenario: string; difficulty: string; suggestedNations: string[]; scenarioName?: string } | null;
 }
 
-export type Provider = "local" | "google" | "openai" | "anthropic" | "deepseek";
+export type Provider = "local" | "free-ai" | "google" | "openai" | "anthropic" | "deepseek";
 
 export interface GameConfig {
   year: number;
@@ -28,6 +28,12 @@ const MODELS: Record<Provider, { id: string; name: string }[]> = {
     { id: "claude", name: "Claude (via CLI)" },
     { id: "codex", name: "Codex (via CLI)" },
     { id: "gemini", name: "Gemini (via CLI)" },
+  ],
+  "free-ai": [
+    { id: "auto", name: "Auto (best available)" },
+    { id: "gemini-2.5-flash", name: "Gemini 2.5 Flash" },
+    { id: "groq-llama-70b", name: "Llama 3.3 70B (Groq)" },
+    { id: "groq-qwen3-32b", name: "Qwen3 32B (Groq)" },
   ],
   deepseek: [
     { id: "deepseek-reasoner", name: "DeepSeek R1 (Reasoning)" },
@@ -59,7 +65,7 @@ const DIFFICULTY_OPTIONS: { value: GameConfig["difficulty"]; label: string; icon
 ];
 
 const isLocalhost = typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
-const DEFAULT_PROVIDER: Provider = isLocalhost ? "local" : "deepseek";
+const DEFAULT_PROVIDER: Provider = isLocalhost ? "local" : "free-ai";
 
 const getProviderStorageKey = (provider: Provider) => `oh_key_${provider}`;
 
@@ -179,12 +185,13 @@ export default function GameSetup({ provinces, onStartGame, onBack, preset }: Ga
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const k = apiKey.trim();
-    if (!playerNationId || (provider !== "local" && !k)) { alert("Please select a nation and provide an API Key."); return; }
+    const keyless = provider === "local" || provider === "free-ai";
+    if (!playerNationId || (!keyless && !k)) { alert("Please select a nation and provide an API Key."); return; }
     persistProviderKey(provider, k, rememberKey);
     onStartGame({ year, scenario, playerNationId, apiKey: k, provider, model, difficulty });
   };
 
-  const providerLabel = provider === "local" ? "Local AI (No Key)" : provider === "deepseek" ? "DeepSeek" : provider === "google" ? "Google Gemini" : provider === "openai" ? "OpenAI" : "Anthropic Claude";
+  const providerLabel = provider === "local" ? "Local AI (No Key)" : provider === "free-ai" ? "Free AI (No Key)" : provider === "deepseek" ? "DeepSeek" : provider === "google" ? "Google Gemini" : provider === "openai" ? "OpenAI" : "Anthropic Claude";
 
   /* ---- card wrapper: matches the reference design exactly ---- */
   const Card = ({ children, glowFrom, glowTo }: { children: React.ReactNode; glowFrom: string; glowTo: string }) => (
@@ -254,6 +261,7 @@ export default function GameSetup({ provinces, onStartGame, onBack, preset }: Ga
                       className="w-full bg-[#1E2538] border-none rounded-xl py-3 pl-4 pr-10 text-sm text-gray-200 shadow-inner appearance-none focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
                     >
                       {isLocalhost && <option value="local">Local AI (No Key)</option>}
+                      <option value="free-ai">Free AI (No Key)</option>
                       <option value="deepseek">DeepSeek</option>
                       <option value="google">Google Gemini</option>
                       <option value="openai">OpenAI</option>
@@ -282,6 +290,13 @@ export default function GameSetup({ provinces, onStartGame, onBack, preset }: Ga
                     <span className="text-emerald-500 mt-0.5"><IconCheck /></span>
                     <p className="text-xs text-emerald-400 leading-relaxed">
                       Using local AI at <span className="font-mono">localhost:3456</span>. No API key needed.
+                    </p>
+                  </div>
+                ) : provider === "free-ai" ? (
+                  <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-start space-x-3">
+                    <span className="text-emerald-500 mt-0.5"><IconCheck /></span>
+                    <p className="text-xs text-emerald-400 leading-relaxed">
+                      Using the free AI gateway. No API key needed.
                     </p>
                   </div>
                 ) : (

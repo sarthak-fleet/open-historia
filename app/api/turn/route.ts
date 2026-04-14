@@ -150,7 +150,7 @@ export async function POST(req: NextRequest) {
   try {
     const { command, gameState, config, history, events, relations, provinceSummary, storySoFar, promptOverrides } = await req.json();
 
-    if (config.provider !== "local" && !config.apiKey) {
+    if (config.provider !== "local" && config.provider !== "free-ai" && !config.apiKey) {
       return NextResponse.json({ error: "API Key missing" }, { status: 400 });
     }
 
@@ -209,6 +209,19 @@ export async function POST(req: NextRequest) {
         if (!responseText && lastModelError) {
           throw lastModelError;
         }
+        break;
+      }
+      case "free-ai": {
+        const gateway = new OpenAI({
+          apiKey: config.apiKey || process.env.FREE_AI_API_KEY || "x",
+          baseURL: process.env.FREE_AI_GATEWAY_URL || "https://free-ai-gateway.sarthakagrawal927.workers.dev/v1",
+          defaultHeaders: { "x-gateway-project-id": "open-historia" },
+        });
+        const freeAiCompletion = await gateway.chat.completions.create({
+          messages: [{ role: "system", content: systemPrompt }],
+          model: config.model || "auto",
+        });
+        responseText = freeAiCompletion.choices[0].message.content || "{}";
         break;
       }
       case "deepseek": {

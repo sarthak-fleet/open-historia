@@ -132,6 +132,19 @@ async function callProvider(
       return "{}";
     }
 
+    case "free-ai": {
+      const gateway = new OpenAI({
+        apiKey: config.apiKey || process.env.FREE_AI_API_KEY || "x",
+        baseURL: process.env.FREE_AI_GATEWAY_URL || "https://free-ai-gateway.sarthakagrawal927.workers.dev/v1",
+        defaultHeaders: { "x-gateway-project-id": "open-historia" },
+      });
+      const freeAiCompletion = await gateway.chat.completions.create({
+        messages: [{ role: "system", content: prompt }],
+        model: config.model || "auto",
+      });
+      return freeAiCompletion.choices[0].message.content || "{}";
+    }
+
     case "deepseek": {
       const deepseek = new OpenAI({
         apiKey: config.apiKey,
@@ -218,7 +231,7 @@ export async function POST(req: NextRequest) {
     };
 
     // --- Validation ---
-    if (config?.provider !== "local" && !config?.apiKey) {
+    if (config?.provider !== "local" && config?.provider !== "free-ai" && !config?.apiKey) {
       return NextResponse.json(
         { error: "API Key missing" },
         { status: 400 }
