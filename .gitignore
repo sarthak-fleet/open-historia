@@ -43,3 +43,4 @@ DATABASE_OPTIONS_RESEARCH.md
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.saasmaker.json
