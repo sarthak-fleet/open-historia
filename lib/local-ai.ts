@@ -1,10 +1,11 @@
-const BRIDGE_URL = process.env.CLI_BRIDGE_URL || "http://localhost:3456";
+const LOCAL_AI_URL =
+  process.env.LOCAL_AI_URL || process.env.CLI_BRIDGE_URL || "http://localhost:3456";
 
 /**
- * Call the local cli-bridge SSE server and collect the full response.
- * The bridge spawns CLI tools (claude, codex, gemini) locally — no API key needed.
+ * Call the local AI SSE server and collect the full response.
+ * The server spawns CLI tools (claude, codex, gemini) locally — no API key needed.
  */
-export async function callCliBridge(opts: {
+export async function callLocalAI(opts: {
   provider?: string;
   model?: string;
   prompt: string;
@@ -12,7 +13,7 @@ export async function callCliBridge(opts: {
 }): Promise<string> {
   const { provider = "claude", model, prompt, systemPrompt } = opts;
 
-  const res = await fetch(`${BRIDGE_URL}/api/chat`, {
+  const res = await fetch(`${LOCAL_AI_URL}/api/chat`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -25,12 +26,12 @@ export async function callCliBridge(opts: {
 
   if (!res.ok) {
     const body = await res.text();
-    throw new Error(`cli-bridge error (${res.status}): ${body}`);
+    throw new Error(`local-ai error (${res.status}): ${body}`);
   }
 
   // Read SSE stream and collect text chunks
   const reader = res.body?.getReader();
-  if (!reader) throw new Error("cli-bridge returned no readable stream");
+  if (!reader) throw new Error("local-ai returned no readable stream");
 
   const decoder = new TextDecoder();
   let collected = "";

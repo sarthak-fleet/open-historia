@@ -71,7 +71,7 @@ graph TB
         GPT["GPT-4 API (OpenAI)"]
         Gemini["Gemini API (Google)"]
         DeepSeek["DeepSeek API"]
-        Local["Local CLI Bridge (Dev)"]
+        Local["Local AI (Dev)"]
     end
 
     subgraph "Data Storage"
@@ -270,13 +270,13 @@ See **AGENTS.md** for comprehensive development documentation including:
 ## FAQ
 
 **Q: Do I need an API key?**
-A: Yes, from Anthropic, OpenAI, Google, or DeepSeek. Or use Local CLI Bridge for development (no key needed).
+A: Yes, from Anthropic, OpenAI, Google, or DeepSeek. Or use Local AI for development (no key needed).
 
 **Q: Are saves stored online?**
 A: Optional. Local-only saves work without authentication. Cloud saves require Google sign-in.
 
 **Q: Can I play offline?**
-A: No, AI providers require internet. Local CLI Bridge also needs network.
+A: No, AI providers require internet. Local AI also needs network.
 
 **Q: How much do API calls cost?**
 A: Varies by provider. Typical: $0.10-$0.50/hour on GPT-4, less on Gemini/DeepSeek.

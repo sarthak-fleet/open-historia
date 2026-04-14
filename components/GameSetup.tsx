@@ -184,7 +184,7 @@ export default function GameSetup({ provinces, onStartGame, onBack, preset }: Ga
     onStartGame({ year, scenario, playerNationId, apiKey: k, provider, model, difficulty });
   };
 
-  const providerLabel = provider === "local" ? "Local CLI Bridge (No Key)" : provider === "deepseek" ? "DeepSeek" : provider === "google" ? "Google Gemini" : provider === "openai" ? "OpenAI" : "Anthropic Claude";
+  const providerLabel = provider === "local" ? "Local AI (No Key)" : provider === "deepseek" ? "DeepSeek" : provider === "google" ? "Google Gemini" : provider === "openai" ? "OpenAI" : "Anthropic Claude";
 
   /* ---- card wrapper: matches the reference design exactly ---- */
   const Card = ({ children, glowFrom, glowTo }: { children: React.ReactNode; glowFrom: string; glowTo: string }) => (
@@ -253,7 +253,7 @@ export default function GameSetup({ provinces, onStartGame, onBack, preset }: Ga
                       onChange={e => handleProviderChange(e.target.value as Provider)}
                       className="w-full bg-[#1E2538] border-none rounded-xl py-3 pl-4 pr-10 text-sm text-gray-200 shadow-inner appearance-none focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
                     >
-                      {isLocalhost && <option value="local">Local CLI Bridge (No Key)</option>}
+                      {isLocalhost && <option value="local">Local AI (No Key)</option>}
                       <option value="deepseek">DeepSeek</option>
                       <option value="google">Google Gemini</option>
                       <option value="openai">OpenAI</option>
@@ -281,7 +281,7 @@ export default function GameSetup({ provinces, onStartGame, onBack, preset }: Ga
                   <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-start space-x-3">
                     <span className="text-emerald-500 mt-0.5"><IconCheck /></span>
                     <p className="text-xs text-emerald-400 leading-relaxed">
-                      Using local CLI bridge at <span className="font-mono">localhost:3456</span>. No API key needed.
+                      Using local AI at <span className="font-mono">localhost:3456</span>. No API key needed.
                     </p>
                   </div>
                 ) : (

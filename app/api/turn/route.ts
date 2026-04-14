@@ -3,7 +3,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import OpenAI from "openai";
 import Anthropic from "@anthropic-ai/sdk";
 import { buildGameMasterPrompt } from "@/lib/ai-prompts";
-import { callCliBridge } from "@/lib/cli-bridge";
+import { callLocalAI } from "@/lib/local-ai";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 // ---------------------------------------------------------------------------
@@ -170,7 +170,7 @@ export async function POST(req: NextRequest) {
 
     switch (config.provider) {
       case "local": {
-        responseText = await callCliBridge({
+        responseText = await callLocalAI({
           provider: config.model || "claude",
           prompt: systemPrompt,
           systemPrompt: "You are a JSON-only response bot for a grand strategy game. Never explain your answer, only return valid JSON.",

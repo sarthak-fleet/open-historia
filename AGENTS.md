@@ -29,7 +29,7 @@
 - **AI as Game Engine**: The AI doesn't just respond - it adjudicates outcomes, drives independent nation behavior, and generates emergent narratives
 - **Natural Language Interface**: Players issue commands via terminal (e.g., "Invade West Coast (USA)", "Negotiate with Japan")
 - **Deterministic State Updates**: AI returns strict JSON that updates game state predictably
-- **Multi-Provider Support**: Anthropic Claude, OpenAI GPT, Google Gemini, DeepSeek, or local CLI bridge
+- **Multi-Provider Support**: Anthropic Claude, OpenAI GPT, Google Gemini, DeepSeek, or local AI
 
 ### Technology Stack
 ```
@@ -338,7 +338,7 @@ db/schema.ts (Drizzle schema)
 db/index.ts
 └─ Turso database client
 
-cli-bridge.ts (63 lines)
+local-ai.ts
 └─ Local development AI bridge (no API keys required)
 
 cities.ts (114 lines)
@@ -359,7 +359,7 @@ map-generator.ts (13 lines - deprecated)
 package.json
 ├─ Dependencies: Next.js, React, MapLibre GL, react-map-gl, Drizzle, Better Auth, AI SDKs
 ├─ Scripts: dev, build, lint, db:generate, db:push, db:studio
-└─ Dev server starts CLI bridge: "cd server && npm install && node index.mjs &"
+└─ Dev server starts local AI: "cd server && npm install && node index.mjs &"
 
 tsconfig.json
 └─ Strict TypeScript with path aliases (@/*)
@@ -378,7 +378,7 @@ drizzle.config.ts - Database migration config
 
 ```
 index.mjs
-└─ Local CLI bridge Express server (port 3001)
+└─ Local AI Express server (port 3001)
 ```
 
 ### Public Assets (`/public/`)
@@ -636,7 +636,7 @@ npm install
 cp .env.example .env.local
 # Edit .env.local with credentials (or leave blank for local-only mode)
 
-# Run development server (includes CLI bridge)
+# Run development server (includes local AI)
 npm run dev
 
 # Open browser
@@ -1065,7 +1065,7 @@ if (data.newEvents && Array.isArray(data.newEvents)) {
 **Reasons**:
 - User choice of cost/performance tradeoff
 - Fallback options if one provider is down
-- Local CLI bridge for development without API keys
+- Local AI for development without API keys
 - Different models excel at different aspects (Claude for narrative, GPT for structured output)
 
 **Implementation**:
@@ -1328,7 +1328,7 @@ const testProviderSwitch = async () => {
 
 ```bash
 # Development
-npm run dev           # Start dev server (includes CLI bridge on :3001)
+npm run dev           # Start dev server (includes local AI on :3001)
 npm run build         # Production build
 npm run start         # Production server
 npm run lint          # ESLint check
