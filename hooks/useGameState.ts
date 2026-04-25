@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { GameConfig } from "@/components/GameSetup";
+import { GameConfig } from "@/lib/types";
 import { Province, GameState, MapTheme, Preset } from "@/lib/types";
 import { loadWorldData } from "@/lib/world-loader";
 import { INITIAL_PLAYERS } from "@/lib/map-generator";

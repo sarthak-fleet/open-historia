@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { GameConfig } from "@/components/GameSetup";
+import { GameConfig } from "@/lib/types";
 import {
   GameState,
   GameEvent,

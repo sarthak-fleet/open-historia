@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { Province } from "@/lib/types";
+import { GameConfig, Provider, Province } from "@/lib/types";
 import { encryptKey, decryptKey } from "@/lib/crypto";
 
 interface GameSetupProps {
@@ -11,17 +11,8 @@ interface GameSetupProps {
   preset?: { year: number; scenario: string; difficulty: string; suggestedNations: string[]; scenarioName?: string } | null;
 }
 
-export type Provider = "local" | "free-ai" | "google" | "openai" | "anthropic" | "deepseek";
-
-export interface GameConfig {
-  year: number;
-  scenario: string;
-  playerNationId: string;
-  apiKey: string;
-  provider: Provider;
-  model: string;
-  difficulty: "Sandbox" | "Easy" | "Realistic" | "Hardcore" | "Impossible";
-}
+// Re-export for backward compatibility with existing imports
+export type { Provider, GameConfig };
 
 const MODELS: Record<Provider, { id: string; name: string }[]> = {
   local: [

@@ -1,6 +1,18 @@
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type GeoFeature = any;
 
+export type Provider = "local" | "free-ai" | "google" | "openai" | "anthropic" | "deepseek";
+
+export interface GameConfig {
+  year: number;
+  scenario: string;
+  playerNationId: string;
+  apiKey: string;
+  provider: Provider;
+  model: string;
+  difficulty: "Sandbox" | "Easy" | "Realistic" | "Hardcore" | "Impossible";
+}
+
 export type Player = {
   id: string;
   name: string;

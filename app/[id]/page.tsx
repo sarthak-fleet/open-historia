@@ -1,4 +1,6 @@
-import GamePage from "../page";
+export const dynamic = "force-dynamic";
+
+import GameClientWrapper from "../_components/GameClientWrapper";
 
 export default async function GameByIdPage({
   params,
@@ -6,5 +8,5 @@ export default async function GameByIdPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  return <GamePage initialGameId={id} />;
+  return <GameClientWrapper initialGameId={id} />;
 }

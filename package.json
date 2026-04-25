@@ -4,8 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "cd server && npm install --silent && node index.mjs & next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
+    "cf:build": "opennextjs-cloudflare build",
+    "deploy": "pnpm cf:build && wrangler deploy",
     "lint": "eslint",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
@@ -35,18 +37,24 @@
     "world-atlas": "^2.0.2"
   },
   "devDependencies": {
+    "@opennextjs/cloudflare": "^1.19.4",
+    "@saas-maker/eslint-config": "^1.0.1",
+    "@saas-maker/prettier-config": "^1.0.0",
+    "@saas-maker/tsconfig": "^1.0.0",
     "@tailwindcss/postcss": "^4.2.4",
     "@types/node": "^25.6.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "babel-plugin-react-compiler": "1.0.0",
     "drizzle-kit": "^0.31.10",
-    "eslint": "^10.2.1",
+    "eslint": "^9.39.4",
     "eslint-config-next": "16.2.4",
     "husky": "^9.1.7",
     "tailwindcss": "^4.2.4",
     "topojson-server": "^3.0.1",
     "topojson-simplify": "^3.0.3",
-    "typescript": "^6.0.3"
-  }
+    "typescript": "^6.0.3",
+    "wrangler": "^4.85.0"
+  },
+  "prettier": "@saas-maker/prettier-config"
 }

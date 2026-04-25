@@ -44,3 +44,5 @@ DATABASE_OPTIONS_RESEARCH.md
 *.tsbuildinfo
 next-env.d.ts
 .saasmaker.json
+.open-next
+.wrangler
