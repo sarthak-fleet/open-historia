@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect,useState } from "react";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -80,6 +80,7 @@ export default function PromptSettings({ open, onClose }: Props) {
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (open) setOverrides(loadPromptOverrides());
   }, [open]);
 

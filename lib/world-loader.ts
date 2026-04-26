@@ -1,6 +1,7 @@
-import * as topojson from "topojson-client";
 import { geoCentroid } from "d3-geo";
-import { Province } from "./types";
+import * as topojson from "topojson-client";
+
+import type { Province } from "./types";
 
 // ISO 3166-1 numeric code mapping for all countries in world-50m.json
 const COUNTRY_NAMES: Record<string, string> = {

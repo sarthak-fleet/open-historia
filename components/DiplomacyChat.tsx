@@ -1,13 +1,14 @@
 "use client";
 
 import React, {
-  useState,
-  useEffect,
-  useRef,
-  useMemo,
   useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
 } from "react";
-import { ChatThread, ChatMessage, Province, Player } from "@/lib/types";
+
+import type { ChatMessage, ChatThread, Player,Province } from "@/lib/types";
 
 // ---------------------------------------------------------------------------
 // Props
@@ -545,6 +546,7 @@ export default function DiplomacyChat({
     if (chatThreads.length > prevThreadCountRef.current) {
       // A new thread was added - open it
       const newest = chatThreads[chatThreads.length - 1];
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (newest) setActiveThreadId(newest.id);
     }
     prevThreadCountRef.current = chatThreads.length;

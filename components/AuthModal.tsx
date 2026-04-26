@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+
 import { authClient } from "@/lib/auth-client";
 
 interface AuthModalProps {

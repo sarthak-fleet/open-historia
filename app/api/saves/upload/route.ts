@@ -1,8 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import { headers } from "next/headers";
+import type { NextRequest} from "next/server";
+import { NextResponse } from "next/server";
+
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { savedGame } from "@/lib/db/schema";
-import { headers } from "next/headers";
 
 function stripApiKey(configJson: string): string {
   try {

@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect,useState } from "react";
+
 import { authClient } from "@/lib/auth-client";
-import { uploadLocalSavesToCloud, localListSavedGames } from "@/lib/game-storage";
+import { localListSavedGames,uploadLocalSavesToCloud } from "@/lib/game-storage";
 
 const UPLOAD_PROMPTED_KEY = "oh_upload_prompted";
 
@@ -21,6 +22,7 @@ export default function UserMenu({ user, onRefreshSaves }: UserMenuProps) {
     if (alreadyPrompted) return;
     const localSaves = localListSavedGames();
     if (localSaves.length > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShowUploadPrompt(true);
     }
   }, []);

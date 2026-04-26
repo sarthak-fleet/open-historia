@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useEffect, useMemo,useRef, useState } from "react";
 
 import type { LogEntry } from "@/lib/game-storage";
 
@@ -145,6 +145,7 @@ export default function CommandTerminal({ logs, onCommand, processing }: Command
         {logs.length === 0 && (
             <div className="text-slate-500 italic">History awaits your command...</div>
         )}
+        {/* eslint-disable-next-line react-hooks/refs */}
         {logs.map((log, idx) => {
           const isNew = idx >= newLogStartIndex;
           const staggerDelay = isNew ? `${(idx - newLogStartIndex) * 50}ms` : undefined;

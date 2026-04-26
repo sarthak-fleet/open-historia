@@ -1,23 +1,27 @@
 "use client";
 
-import React, {
-  useRef,
-  useEffect,
-  useState,
-  useCallback,
-  useMemo,
-} from "react";
-import MapGL, {
-  Source,
-  Layer,
-  MapLayerMouseEvent,
-  MapRef,
-} from "react-map-gl/maplibre";
 import "maplibre-gl/dist/maplibre-gl.css";
+
+import type { Feature, FeatureCollection, Geometry, MultiPolygon,Polygon } from "geojson";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import type {
+  MapLayerMouseEvent,
+  MapRef} from "react-map-gl/maplibre";
+import MapGL, {
+  Layer,
+  Source,
+} from "react-map-gl/maplibre";
 import * as topojson from "topojson-client";
-import type { FeatureCollection, Feature, Geometry, Polygon, MultiPolygon } from "geojson";
-import { Province, Player, MapTheme, DiplomaticRelation } from "@/lib/types";
+
 import { WORLD_CITIES } from "@/lib/cities";
+import type { DiplomaticRelation,MapTheme, Player, Province } from "@/lib/types";
+
 import Tooltip from "./Tooltip";
 
 // ---------------------------------------------------------------------------
@@ -654,7 +658,7 @@ export default function MapView({
       fetch("/admin1-detail.json")
         .then((res) => res.json())
         .then((topoData) => {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+           
           const geo = topojson.feature(
             topoData,
             topoData.objects.states
@@ -770,6 +774,7 @@ export default function MapView({
 
   const tooltipScreenPos = useMemo(() => {
     if (!tooltipData) return null;
+    // eslint-disable-next-line react-hooks/refs
     const container = mapRef.current?.getMap()?.getContainer();
     if (!container) return tooltipData.position;
     const rect = container.getBoundingClientRect();

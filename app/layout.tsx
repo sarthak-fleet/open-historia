@@ -1,7 +1,9 @@
+import "./globals.css";
+
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Playfair_Display } from "next/font/google";
-import "./globals.css";
+
 import { SaaSMakerFeedback } from "../components/saasmaker-feedback";
 import { SaasMakerAnalytics } from "../components/SaasMakerAnalytics";
 

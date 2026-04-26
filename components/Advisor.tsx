@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useCallback } from "react";
-import { AdvisorMessage } from "@/lib/types";
+import React, { useCallback,useEffect, useRef, useState } from "react";
+
+import type { AdvisorMessage } from "@/lib/types";
 
 // ---------------------------------------------------------------------------
 // Props

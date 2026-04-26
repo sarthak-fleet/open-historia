@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Province, Player } from "@/lib/types";
+
+import type { Player,Province } from "@/lib/types";
 
 interface SidebarProps {
   province: Province | null;

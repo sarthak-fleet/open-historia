@@ -1,16 +1,17 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { GameConfig } from "@/lib/types";
-import {
-  GameState,
-  GameEvent,
-  ChatThread,
-  ChatMessage,
-  DiplomaticRelation,
-} from "@/lib/types";
-import { LogEntry } from "@/lib/game-storage";
+import { useCallback,useState } from "react";
+
 import { loadPromptOverrides } from "@/components/PromptSettings";
+import { LogEntry } from "@/lib/game-storage";
+import type { GameConfig } from "@/lib/types";
+import type {
+  ChatMessage,
+  ChatThread,
+  DiplomaticRelation,
+  GameEvent,
+  GameState,
+} from "@/lib/types";
 
 const MAX_MESSAGES_PER_THREAD = 100;
 

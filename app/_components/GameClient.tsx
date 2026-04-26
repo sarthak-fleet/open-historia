@@ -1,16 +1,16 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
 import dynamic from "next/dynamic";
-import { GameConfig, DiplomaticRelation } from "@/lib/types";
-import { LogEntry } from "@/lib/game-storage";
+import React, { useCallback,useEffect, useRef, useState } from "react";
 
-import { useGameState } from "@/hooks/useGameState";
-import { useTurnProcessing } from "@/hooks/useTurnProcessing";
-import { useDiplomacy } from "@/hooks/useDiplomacy";
 import { useAdvisor } from "@/hooks/useAdvisor";
-import { useTimeline } from "@/hooks/useTimeline";
+import { useDiplomacy } from "@/hooks/useDiplomacy";
+import { useGameState } from "@/hooks/useGameState";
 import { useSaveLoad } from "@/hooks/useSaveLoad";
+import { useTimeline } from "@/hooks/useTimeline";
+import { useTurnProcessing } from "@/hooks/useTurnProcessing";
+import type { LogEntry } from "@/lib/game-storage";
+import type { DiplomaticRelation,GameConfig } from "@/lib/types";
 
 // All heavy components loaded client-side only to avoid SSR issues
 const MapView = dynamic(() => import("@/components/MapView"), { ssr: false });

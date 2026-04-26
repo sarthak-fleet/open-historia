@@ -1,14 +1,17 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { GameConfig } from "@/lib/types";
-import { GameState, GameEvent, Province } from "@/lib/types";
+import { useCallback,useEffect, useState } from "react";
+
+import type {
+  LogEntry} from "@/lib/game-storage";
 import {
-  saveGame,
   autoSave,
-  LogEntry,
   SavedGame,
+  saveGame,
 } from "@/lib/game-storage";
+import type { GameConfig } from "@/lib/types";
+import type { GameEvent, GameState} from "@/lib/types";
+import { Province } from "@/lib/types";
 
 function uid(): string {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -47,6 +50,7 @@ export function useSaveLoad(deps: {
   // Initialize from URL-loaded game
   useEffect(() => {
     if (initialGameIdLoaded) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCurrentGameId(initialGameIdLoaded);
     }
   }, [initialGameIdLoaded]);

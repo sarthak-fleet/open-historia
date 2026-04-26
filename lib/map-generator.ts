@@ -1,4 +1,4 @@
-import { Player } from "./types";
+import type { Player } from "./types";
 
 export const INITIAL_PLAYERS: Record<string, Player> = {
 

@@ -1,14 +1,15 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { GameConfig } from "@/lib/types";
-import {
-  GameState,
-  GameEvent,
-  DiplomaticRelation,
-  AdvisorMessage,
-} from "@/lib/types";
+import { useCallback,useState } from "react";
+
 import { loadPromptOverrides } from "@/components/PromptSettings";
+import type { GameConfig } from "@/lib/types";
+import type {
+  AdvisorMessage,
+  DiplomaticRelation,
+  GameEvent,
+  GameState,
+} from "@/lib/types";
 
 function uid(): string {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {

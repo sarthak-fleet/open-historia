@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import {
-  GameState,
-  GameEvent,
+import { useCallback,useState } from "react";
+
+import type { LogEntry } from "@/lib/game-storage";
+import type {
   DiplomaticRelation,
+  GameEvent,
+  GameState,
   TimelineSnapshot,
 } from "@/lib/types";
-import { LogEntry } from "@/lib/game-storage";
 
 export function useTimeline(deps: {
   gameState: GameState | null;

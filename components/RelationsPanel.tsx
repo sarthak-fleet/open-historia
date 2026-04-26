@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useMemo,useState } from "react";
+
 import type { DiplomaticRelation, Province } from "@/lib/types";
 
 interface RelationsPanelProps {

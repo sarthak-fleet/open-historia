@@ -1,10 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import OpenAI from "openai";
 import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import type { NextRequest} from "next/server";
+import { NextResponse } from "next/server";
+import OpenAI from "openai";
+
 import { buildAdvisorPrompt } from "@/lib/ai-prompts";
 import { callLocalAI } from "@/lib/local-ai";
-import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { getClientIp,rateLimit } from "@/lib/rate-limit";
 
 // ---------------------------------------------------------------------------
 // Constants & Helpers

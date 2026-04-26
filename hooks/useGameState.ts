@@ -1,20 +1,22 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { GameConfig } from "@/lib/types";
-import { Province, GameState, MapTheme, Preset } from "@/lib/types";
-import { loadWorldData } from "@/lib/world-loader";
-import { INITIAL_PLAYERS } from "@/lib/map-generator";
+import { useCallback,useEffect, useState } from "react";
+
+import { authClient } from "@/lib/auth-client";
+import type {
+  LogEntry,
+  SavedGame} from "@/lib/game-storage";
 import {
+  deleteGame,
   listSavedGames,
   loadGame,
-  deleteGame,
   restoreSavedGameState,
   setAuthenticated,
-  SavedGame,
-  LogEntry,
 } from "@/lib/game-storage";
-import { authClient } from "@/lib/auth-client";
+import { INITIAL_PLAYERS } from "@/lib/map-generator";
+import type { GameConfig } from "@/lib/types";
+import type { GameEvent, GameState, MapTheme, Preset,Province } from "@/lib/types";
+import { loadWorldData } from "@/lib/world-loader";
 
 function uid(): string {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -50,12 +52,13 @@ export function useGameState(initialGameId?: string) {
   // Sync auth state + re-fetch saves when session changes
   useEffect(() => {
     setAuthenticated(!!authSession?.user);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     refreshSavedGames();
   }, [authSession, refreshSavedGames]);
 
   // Initial data load + optional game restore from URL
   const [initialLogs, setInitialLogs] = useState<LogEntry[]>([]);
-  const [initialEvents, setInitialEvents] = useState<import("@/lib/types").GameEvent[]>([]);
+  const [initialEvents, setInitialEvents] = useState<GameEvent[]>([]);
   const [initialStorySoFar, setInitialStorySoFar] = useState("");
   const [initialGameIdLoaded, setInitialGameIdLoaded] = useState<string | null>(null);
 
@@ -181,7 +184,7 @@ export function useGameState(initialGameId?: string) {
       config: GameConfig;
       state: GameState;
       provinces: Province[];
-      events: import("@/lib/types").GameEvent[];
+      events: GameEvent[];
       storySoFar: string;
       logs: LogEntry[];
     } | null> => {

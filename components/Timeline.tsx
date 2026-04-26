@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useRef, useCallback, useEffect, useMemo } from "react";
-import { TimelineSnapshot, GameEvent } from "@/lib/types";
+import React, { useCallback, useEffect, useMemo,useRef, useState } from "react";
+
+import type { GameEvent,TimelineSnapshot } from "@/lib/types";
 
 interface TimelineProps {
   snapshots: TimelineSnapshot[];
@@ -392,6 +393,7 @@ export default function Timeline({
       </div>
 
       {/* Fixed-position tooltips (escape overflow-hidden on parent main) */}
+      {/* eslint-disable react-hooks/refs */}
       {(() => {
         const targetId = activeId || hoveredId;
         const snap = targetId ? snapshots.find((s) => s.id === targetId) : null;
@@ -507,6 +509,7 @@ export default function Timeline({
 
         return null;
       })()}
+      {/* eslint-enable react-hooks/refs */}
     </div>
   );
 }

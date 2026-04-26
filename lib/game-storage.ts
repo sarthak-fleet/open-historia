@@ -1,4 +1,4 @@
-import { GameConfig, GameEvent, GameState, MapTheme, Player, Province } from "./types";
+import type { GameConfig, GameEvent, GameState, MapTheme, Player, Province } from "./types";
 
 export interface LogEntry {
   id: string;

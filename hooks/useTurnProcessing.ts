@@ -1,15 +1,16 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { GameConfig } from "@/lib/types";
-import {
-  GameState,
-  GameEvent,
+import { useCallback,useState } from "react";
+
+import { loadPromptOverrides } from "@/components/PromptSettings";
+import type { LogEntry } from "@/lib/game-storage";
+import type { GameConfig } from "@/lib/types";
+import type {
   DiplomaticRelation,
+  GameEvent,
+  GameState,
   TimelineSnapshot,
 } from "@/lib/types";
-import { LogEntry } from "@/lib/game-storage";
-import { loadPromptOverrides } from "@/components/PromptSettings";
 
 const MAX_LOGS = 200;
 const MAX_EVENTS = 200;
