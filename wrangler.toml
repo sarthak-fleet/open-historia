@@ -1,7 +1,14 @@
 name = "open-historia"
+main = ".open-next/worker.js"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
-pages_build_output_dir = ".open-next/assets"
+
+assets = { directory = ".open-next/assets", binding = "ASSETS" }
 
 [vars]
 NODE_ENV = "production"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "open-historia-auth"
+database_id = "2787ee91-c4ae-4619-a64d-36f757460f16"
