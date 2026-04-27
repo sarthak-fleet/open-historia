@@ -46,3 +46,7 @@ next-env.d.ts
 .saasmaker.json
 .open-next
 .wrangler
+
+# fallow cache
+.fallow/
+cache.bin
