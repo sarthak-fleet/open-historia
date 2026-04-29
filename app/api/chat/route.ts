@@ -136,7 +136,7 @@ async function callProvider(
 
     case "free-ai": {
       const gateway = new OpenAI({
-        apiKey: config.apiKey || process.env.FREE_AI_API_KEY || "x",
+        apiKey: config.apiKey || process.env.AI_GATEWAY_API_KEY || process.env.FREE_AI_API_KEY || "x",
         baseURL: process.env.FREE_AI_GATEWAY_URL || "https://free-ai-gateway.sarthakagrawal927.workers.dev/v1",
         defaultHeaders: { "x-gateway-project-id": "open-historia" },
       });
