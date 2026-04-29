@@ -20,8 +20,3 @@ simple = { limit = 1000, period = 60 }
 
 [vars]
 NODE_ENV = "production"
-
-[[d1_databases]]
-binding = "DB"
-database_name = "open-historia-auth"
-database_id = "0fa5a48e-9900-4d81-a32a-f0a438914aa0"
