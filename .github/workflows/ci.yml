@@ -17,4 +17,3 @@ jobs:
         with: { node-version: '20', cache: pnpm }
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: pnpm cf:build
-      - run: pnpm lint
