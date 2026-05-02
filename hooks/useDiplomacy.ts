@@ -1,14 +1,13 @@
 "use client";
 
-import { useCallback,useState } from "react";
+import { useCallback, useState } from "react";
 
 import { loadPromptOverrides } from "@/components/PromptSettings";
-import { LogEntry } from "@/lib/game-storage";
-import type { GameConfig } from "@/lib/types";
 import type {
   ChatMessage,
   ChatThread,
   DiplomaticRelation,
+  GameConfig,
   GameEvent,
   GameState,
 } from "@/lib/types";

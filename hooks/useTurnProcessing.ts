@@ -37,7 +37,6 @@ export function useTurnProcessing(deps: {
     setGameState,
     relations,
     setRelations,
-    timelineSnapshots,
     setTimelineSnapshots,
   } = deps;
 

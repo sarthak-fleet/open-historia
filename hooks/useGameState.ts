@@ -90,7 +90,7 @@ export function useGameState(initialGameId?: string) {
       setLoading(false);
     }
     load();
-  }, [refreshSavedGames]);
+  }, [refreshSavedGames, initialGameId]);
 
   // Preset selection
   const handleSelectPreset = useCallback((preset: Preset) => {

@@ -105,7 +105,7 @@ export default function GameClient({ initialGameId }: { initialGameId?: string }
       turn.setEvents(game.initialEvents);
       turn.setStorySoFar(game.initialStorySoFar);
     }
-  }, [game.initialLogs]);
+  }, [game.initialLogs, game.initialEvents, game.initialStorySoFar, turn]);
 
   // ── Game start handler (bridges game + turn + diplomacy + advisor state) ──
   const handleStartGame = useCallback(
@@ -179,7 +179,7 @@ export default function GameClient({ initialGameId }: { initialGameId?: string }
       return () => clearTimeout(timer);
     }
     if (game.gameState) prevTurnRef.current = game.gameState.turn;
-  }, [game.gameState?.turn]);
+  }, [game.gameState]);
 
   // ── Render ──
 

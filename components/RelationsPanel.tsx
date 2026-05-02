@@ -2,12 +2,11 @@
 
 import React, { useMemo,useState } from "react";
 
-import type { DiplomaticRelation, Province } from "@/lib/types";
+import type { DiplomaticRelation } from "@/lib/types";
 
 interface RelationsPanelProps {
   relations: DiplomaticRelation[];
   playerNationName: string;
-  provinces: Province[];
 }
 
 const RELATION_COLORS: Record<string, { bg: string; text: string; border: string }> = {
@@ -21,7 +20,7 @@ const RELATION_COLORS: Record<string, { bg: string; text: string; border: string
 
 const RELATION_ORDER = ["war", "hostile", "allied", "friendly", "vassal", "neutral"];
 
-export default function RelationsPanel({ relations, playerNationName, provinces }: RelationsPanelProps) {
+export default function RelationsPanel({ relations, playerNationName }: RelationsPanelProps) {
   const [expanded, setExpanded] = useState(false);
   const [showNeutral, setShowNeutral] = useState(false);
 

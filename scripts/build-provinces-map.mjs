@@ -42,24 +42,7 @@ async function downloadIfNeeded(url, cachePath) {
   return JSON.parse(text);
 }
 
-function geoCentroid(feature) {
-  // Simple centroid: average of all coordinates
-  const coords = [];
-  function extract(geom) {
-    if (!geom) return;
-    if (geom.type === "Point") coords.push(geom.coordinates);
-    else if (geom.type === "MultiPoint" || geom.type === "LineString") geom.coordinates.forEach((c) => coords.push(c));
-    else if (geom.type === "MultiLineString" || geom.type === "Polygon") geom.coordinates.forEach((ring) => ring.forEach((c) => coords.push(c)));
-    else if (geom.type === "MultiPolygon") geom.coordinates.forEach((poly) => poly.forEach((ring) => ring.forEach((c) => coords.push(c))));
-    else if (geom.type === "GeometryCollection") (geom.geometries || []).forEach(extract);
-    else if (geom.type === "Feature") extract(geom.geometry);
-  }
-  extract(feature.geometry || feature);
-  if (coords.length === 0) return [0, 0];
-  let sx = 0, sy = 0;
-  for (const [x, y] of coords) { sx += x; sy += y; }
-  return [sx / coords.length, sy / coords.length];
-}
+
 
 // ── Main ───────────────────────────────────────────────────────────────────
 

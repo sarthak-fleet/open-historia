@@ -2,16 +2,9 @@
 
 import { useCallback,useEffect, useState } from "react";
 
-import type {
-  LogEntry} from "@/lib/game-storage";
-import {
-  autoSave,
-  SavedGame,
-  saveGame,
-} from "@/lib/game-storage";
-import type { GameConfig } from "@/lib/types";
-import type { GameEvent, GameState} from "@/lib/types";
-import { Province } from "@/lib/types";
+import type { LogEntry } from "@/lib/game-storage";
+import { autoSave, saveGame } from "@/lib/game-storage";
+import type { GameConfig, GameEvent, GameState } from "@/lib/types";
 
 function uid(): string {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
