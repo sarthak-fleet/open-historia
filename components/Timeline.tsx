@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useMemo,useRef, useState } from "react";
 
 import type { GameEvent,TimelineSnapshot } from "@/lib/types";
+import { diffTimelineSnapshots } from "@/lib/state-diff";
 
 interface TimelineProps {
   snapshots: TimelineSnapshot[];
@@ -215,7 +216,6 @@ export default function Timeline({
   }, []);
 
   const handleNodeClick = (snapshotId: string) => {
-    if (snapshotId === currentSnapshotId) return;
     setActiveId((prev) => (prev === snapshotId ? null : snapshotId));
   };
 
@@ -407,41 +407,104 @@ export default function Timeline({
         const isCurrent = snap.id === currentSnapshotId;
         const category = classifySnapshot(snap);
         const colors = NODE_COLORS[category];
+        const parentSnapshot = snap.parentSnapshotId
+          ? snapshots.find((candidate) => candidate.id === snap.parentSnapshotId)
+          : null;
+        const diff = diffTimelineSnapshots(parentSnapshot, snap);
 
         // Action popover (on click, non-current nodes)
-        if (activeId === snap.id && !isCurrent) {
+        if (activeId === snap.id) {
           return (
             <div
-              className="fixed w-44 bg-slate-900/95 border border-slate-600 rounded-lg p-2.5 shadow-2xl backdrop-blur-lg z-[60]"
+              className="fixed w-80 bg-slate-900/95 border border-slate-600 rounded-lg p-3 shadow-2xl backdrop-blur-lg z-[60]"
               style={{
                 left: screenX,
                 bottom: window.innerHeight - screenY + 12,
                 transform: "translateX(-50%)",
               }}
             >
-              <div className="text-amber-400 font-bold text-[11px] mb-2 text-center">
-                Year {snap.turnYear}
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <div>
+                  <div className="text-amber-400 font-bold text-[11px] uppercase tracking-wider">
+                    Turn Replay
+                  </div>
+                  <div className="text-slate-400 text-[10px]">
+                    Year {snap.turnYear} · {formatTimestamp(snap.timestamp)}
+                  </div>
+                </div>
+                <span className={`text-[9px] uppercase font-bold ${colors.badge}`}>
+                  {category}
+                </span>
               </div>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onRewind(snap.id);
-                  setActiveId(null);
-                }}
-                className="w-full mb-1.5 px-3 py-1.5 bg-amber-700/80 hover:bg-amber-600 text-white text-[11px] font-bold rounded transition-colors uppercase tracking-wide"
-              >
-                Rewind Here
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onBranch(snap.id);
-                  setActiveId(null);
-                }}
-                className="w-full px-3 py-1.5 bg-sky-700/80 hover:bg-sky-600 text-white text-[11px] font-bold rounded transition-colors uppercase tracking-wide"
-              >
-                Branch Timeline
-              </button>
+
+              <div className="rounded border border-slate-700 bg-slate-950/60 p-2 mb-2">
+                <div className="text-slate-500 text-[9px] uppercase mb-1">Command</div>
+                <div className="text-slate-300 text-[11px] leading-relaxed">
+                  {truncate(snap.command, 180)}
+                </div>
+              </div>
+
+              <div className="rounded border border-slate-700 bg-slate-950/60 p-2 mb-2">
+                <div className="text-slate-500 text-[9px] uppercase mb-1">State diff</div>
+                <div className="flex flex-wrap gap-1 mb-2">
+                  {diff.summary.map((line) => (
+                    <span key={line} className="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] text-slate-300">
+                      {line}
+                    </span>
+                  ))}
+                </div>
+                {diff.ownerChanges.slice(0, 4).map((change) => (
+                  <div key={change.provinceId} className="text-[10px] text-slate-400 truncate">
+                    Province {change.provinceId}: {change.from ?? "none"} → {change.to ?? "none"}
+                  </div>
+                ))}
+                {diff.ownerChanges.length > 4 && (
+                  <div className="text-[10px] text-slate-600">
+                    +{diff.ownerChanges.length - 4} more province changes
+                  </div>
+                )}
+                {diff.relationChanges.slice(0, 3).map((change) => (
+                  <div key={change.label} className="text-[10px] text-slate-400 truncate">
+                    {change.label}: {change.from ?? "none"} → {change.to ?? "none"}
+                  </div>
+                ))}
+              </div>
+
+              {diff.newEvents.length > 0 && (
+                <div className="rounded border border-slate-700 bg-slate-950/60 p-2 mb-2">
+                  <div className="text-slate-500 text-[9px] uppercase mb-1">New events</div>
+                  {diff.newEvents.slice(0, 3).map((event) => (
+                    <div key={event.id} className="text-[10px] text-slate-400 truncate">
+                      {event.description}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {!isCurrent && (
+                <div className="grid grid-cols-2 gap-1.5">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onRewind(snap.id);
+                      setActiveId(null);
+                    }}
+                    className="px-3 py-1.5 bg-amber-700/80 hover:bg-amber-600 text-white text-[11px] font-bold rounded transition-colors uppercase tracking-wide"
+                  >
+                    Rewind
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onBranch(snap.id);
+                      setActiveId(null);
+                    }}
+                    className="px-3 py-1.5 bg-sky-700/80 hover:bg-sky-600 text-white text-[11px] font-bold rounded transition-colors uppercase tracking-wide"
+                  >
+                    Branch
+                  </button>
+                </div>
+              )}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
