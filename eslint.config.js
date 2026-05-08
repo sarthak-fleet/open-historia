@@ -1,2 +1,6 @@
-import config from "@saas-maker/eslint-config/next";
-export default config;
+import nextConfig from "eslint-config-next";
+
+export default [
+  { ignores: ["dist", ".next", "build", ".wrangler", "node_modules", "out", ".open-next"] },
+  ...nextConfig,
+];

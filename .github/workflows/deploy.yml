@@ -45,11 +45,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: latest
       - uses: actions/setup-node@v4
-        with: { node-version: '20', cache: pnpm }
+        with:
+          node-version: '22'
+      - name: Prepare pnpm
+        run: |
+          corepack enable
+          corepack install
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: pnpm cf:build
       - uses: cloudflare/wrangler-action@v3
@@ -67,11 +69,13 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: latest
       - uses: actions/setup-node@v4
-        with: { node-version: '20', cache: pnpm }
+        with:
+          node-version: '22'
+      - name: Prepare pnpm
+        run: |
+          corepack enable
+          corepack install
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: pnpm cf:build
       - name: Deploy preview worker
