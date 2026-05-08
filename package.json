@@ -1,6 +1,7 @@
 {
   "name": "open-historia",
   "version": "0.1.0",
+  "packageManager": "pnpm@11.0.8",
   "private": true,
   "scripts": {
     "dev": "cd server && npm install --silent && node index.mjs & next dev",
