@@ -13,6 +13,7 @@ import { getClientIp,rateLimit } from "@/lib/rate-limit";
 // ---------------------------------------------------------------------------
 
 const DEFAULT_GEMINI_MODEL = "gemini-3-flash-preview";
+const DEFAULT_FREE_AI_MODEL = "openrouter-openai-gpt-oss-20b-free";
 const FALLBACK_GEMINI_MODELS = [
   "gemini-3-flash-preview",
   "gemini-2.5-flash",
@@ -24,6 +25,11 @@ const normalizeGeminiModel = (model: string | undefined) => {
   const trimmed = model.trim();
   if (!trimmed) return DEFAULT_GEMINI_MODEL;
   return trimmed.startsWith("models/") ? trimmed.slice("models/".length) : trimmed;
+};
+
+const normalizeFreeAiModel = (model: string | undefined) => {
+  const trimmed = model?.trim();
+  return !trimmed || trimmed === "auto" ? DEFAULT_FREE_AI_MODEL : trimmed;
 };
 
 const isModelSelectionError = (error: unknown) => {
@@ -221,7 +227,7 @@ export async function POST(req: NextRequest) {
         });
         const freeAiCompletion = await gateway.chat.completions.create({
           messages: [{ role: "system", content: systemPrompt }],
-          model: config.model || "auto",
+          model: normalizeFreeAiModel(config.model),
         });
         responseText = freeAiCompletion.choices[0].message.content || "{}";
         break;
