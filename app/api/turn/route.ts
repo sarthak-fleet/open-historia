@@ -5,37 +5,13 @@ import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
 import { buildGameMasterPrompt } from "@/lib/ai-prompts";
+import { LLMTimeoutError, withTimeout } from "@/lib/llm-timeout";
 import { callLocalAI } from "@/lib/local-ai";
 import { getClientIp,rateLimit } from "@/lib/rate-limit";
 
 // ---------------------------------------------------------------------------
 // Constants & Helpers
 // ---------------------------------------------------------------------------
-
-const LLM_TIMEOUT_MS = 55_000;
-
-class LLMTimeoutError extends Error {
-  constructor(provider: string) {
-    super(`Provider ${provider} timed out after ${LLM_TIMEOUT_MS}ms`);
-    this.name = "LLMTimeoutError";
-  }
-}
-
-function withTimeout<T>(promise: Promise<T>, provider: string): Promise<T> {
-  return new Promise<T>((resolve, reject) => {
-    const handle = setTimeout(() => reject(new LLMTimeoutError(provider)), LLM_TIMEOUT_MS);
-    promise.then(
-      (value) => {
-        clearTimeout(handle);
-        resolve(value);
-      },
-      (err) => {
-        clearTimeout(handle);
-        reject(err);
-      },
-    );
-  });
-}
 
 const DEFAULT_GEMINI_MODEL = "gemini-3-flash-preview";
 const DEFAULT_FREE_AI_MODEL = "openrouter-openai-gpt-oss-20b-free";
