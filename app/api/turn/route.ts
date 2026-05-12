@@ -158,6 +158,19 @@ export async function POST(req: NextRequest) {
   try {
     const { command, gameState, config, history, events, relations, provinceSummary, storySoFar, promptOverrides } = await req.json();
 
+    if (typeof command !== "string" || command.trim().length === 0) {
+      return NextResponse.json({ error: "Command is required" }, { status: 400 });
+    }
+    if (command.length > 2000) {
+      return NextResponse.json(
+        { error: "Command is too long (max 2000 characters)" },
+        { status: 400 },
+      );
+    }
+    if (!config || typeof config.provider !== "string") {
+      return NextResponse.json({ error: "Provider config is required" }, { status: 400 });
+    }
+
     if (config.provider !== "local" && config.provider !== "free-ai" && !config.apiKey) {
       return NextResponse.json({ error: "API Key missing" }, { status: 400 });
     }
