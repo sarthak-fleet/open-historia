@@ -1,5 +1,9 @@
 # agents.md — open-historia
 
+## Shared Fleet Standard
+
+Also read and follow the shared fleet-level agent standard at `../AGENTS.md`. Treat this repository as owned product code: protect production stability, keep changes scoped, verify work, and record durable follow-up tasks when something remains incomplete or blocked.
+
 ## Purpose
 AI grand-strategy history game — players issue natural language commands to control civilizations; LLM acts as game master returning strict JSON state updates.
 
