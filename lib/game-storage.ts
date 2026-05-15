@@ -236,6 +236,54 @@ export function localDeleteGame(id: string): void {
   }
 }
 
+/**
+ * Validate + import a parsed JSON export into local storage. Accepts
+ * either the wrapped export shape ({format, save}) or a bare SavedGame.
+ * Strips any apiKey from the imported config — never trust a file off
+ * disk to have done that itself. Returns the saved id, or throws with
+ * a user-readable message on bad shape.
+ */
+export function importSavedGame(parsed: unknown): string {
+  const obj = parsed as Record<string, unknown> | null;
+  if (!obj || typeof obj !== "object") {
+    throw new Error("Save file is empty or not JSON.");
+  }
+  // Unwrap the {format, save} export wrapper if present.
+  const candidate =
+    obj.format === "open-historia-save" && obj.save && typeof obj.save === "object"
+      ? (obj.save as Record<string, unknown>)
+      : obj;
+
+  if (
+    typeof candidate.id !== "string" ||
+    !candidate.gameState ||
+    !candidate.gameConfig
+  ) {
+    throw new Error("File is not a valid Open Historia save.");
+  }
+
+  const sanitizedConfig = {
+    ...(candidate.gameConfig as Record<string, unknown>),
+    apiKey: "",
+  };
+
+  const save: SavedGame = {
+    id: candidate.id,
+    timestamp: typeof candidate.timestamp === "number" ? candidate.timestamp : Date.now(),
+    version: typeof candidate.version === "string" ? candidate.version : VERSION,
+    gameState: candidate.gameState as GameState,
+    gameConfig: sanitizedConfig as unknown as GameConfig,
+    logs: Array.isArray(candidate.logs) ? (candidate.logs as LogEntry[]).slice(-50) : [],
+    events: Array.isArray(candidate.events) ? (candidate.events as GameEvent[]).slice(-100) : [],
+    storySoFar: typeof candidate.storySoFar === "string" ? candidate.storySoFar : undefined,
+  };
+
+  const saves = localListSavedGames().filter((s) => s.id !== save.id);
+  saves.push(save);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(saves));
+  return save.id;
+}
+
 // ---------------------------------------------------------------------------
 // Cloud backend (calls API routes)
 // ---------------------------------------------------------------------------

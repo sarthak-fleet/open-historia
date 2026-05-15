@@ -440,12 +440,13 @@ export default function PresetBrowser({
               Loading saves...
             </div>
           )}
-          {!savesLoading && savedGames && savedGames.length > 0 && onLoadSavedGame && onDeleteSavedGame && (
+          {!savesLoading && onLoadSavedGame && onDeleteSavedGame && Boolean((savedGames?.length ?? 0) > 0 || onRefreshSavedGames) && (
             <div className="w-full mb-4">
               <SavedGamesList
-                savedGames={savedGames}
+                savedGames={savedGames ?? []}
                 onLoad={onLoadSavedGame}
                 onDelete={onDeleteSavedGame}
+                onImport={onRefreshSavedGames}
                 getNationName={getNationName}
               />
             </div>
