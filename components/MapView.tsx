@@ -817,9 +817,31 @@ export default function MapView({
   // Render
   // ---------------------------------------------------------------------------
 
+  const accessibilityLabel = useMemo(() => {
+    const playerNames = Object.values(players)
+      .map((p) => p.name)
+      .filter(Boolean)
+      .slice(0, 6);
+    const provinceCount = provinces.length;
+    const themeName = theme ?? "classic";
+    return [
+      `Interactive world map, ${themeName} theme,`,
+      `${provinceCount} province${provinceCount === 1 ? "" : "s"} loaded,`,
+      playerNames.length
+        ? `nations on map: ${playerNames.join(", ")}${playerNames.length < Object.keys(players).length ? "…" : ""}.`
+        : "no nations placed yet.",
+      "Click a province to select it; use mouse wheel or pinch to zoom.",
+    ].join(" ");
+  }, [players, provinces.length, theme]);
+
   return (
     <>
-      <div className="absolute inset-0 w-full h-full overflow-hidden">
+      <div
+        className="absolute inset-0 w-full h-full overflow-hidden"
+        role="application"
+        aria-roledescription="Interactive world map"
+        aria-label={accessibilityLabel}
+      >
         <MapGL
           ref={mapRef}
           initialViewState={{ longitude: 0, latitude: 20, zoom: 1.5 }}

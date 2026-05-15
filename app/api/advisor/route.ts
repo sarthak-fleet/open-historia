@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
 import { buildAdvisorPrompt } from "@/lib/ai-prompts";
+import { LLMTimeoutError, withTimeout } from "@/lib/llm-timeout";
 import { callLocalAI } from "@/lib/local-ai";
 import { getClientIp,rateLimit } from "@/lib/rate-limit";
 
@@ -258,6 +259,12 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+    if (typeof question !== "string" || question.length > 2000) {
+      return NextResponse.json(
+        { error: "Question must be a string under 2000 characters" },
+        { status: 400 }
+      );
+    }
 
     // --- Build prompt ---
     const prompt = buildAdvisorPrompt({
@@ -271,7 +278,7 @@ export async function POST(req: NextRequest) {
     });
 
     // --- Call AI ---
-    const responseText = await callProvider(prompt, config);
+    const responseText = await withTimeout(callProvider(prompt, config), config.provider);
 
     // --- Parse & sanitize ---
     const cleanJson = extractJson(responseText);
@@ -282,6 +289,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("Advisor Error:", error);
 
+    const status = error instanceof LLMTimeoutError ? 504 : 500;
     return NextResponse.json(
       {
         advice:
@@ -290,7 +298,7 @@ export async function POST(req: NextRequest) {
         suggestedActions: ["Wait and try consulting the advisor again"],
         error: error instanceof Error ? error.message : "Internal Server Error",
       },
-      { status: 500 }
+      { status }
     );
   }
 }

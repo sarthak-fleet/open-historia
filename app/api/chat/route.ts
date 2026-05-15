@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
 import { buildDiplomacyPrompt } from "@/lib/ai-prompts";
+import { LLMTimeoutError, withTimeout } from "@/lib/llm-timeout";
 import { callLocalAI } from "@/lib/local-ai";
 import { getClientIp,rateLimit } from "@/lib/rate-limit";
 
@@ -251,6 +252,12 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+    if (typeof message !== "string" || message.length > 2000) {
+      return NextResponse.json(
+        { error: "Message must be a string under 2000 characters" },
+        { status: 400 }
+      );
+    }
 
     // --- Build prompt ---
     const prompt = buildDiplomacyPrompt({
@@ -265,7 +272,7 @@ export async function POST(req: NextRequest) {
     });
 
     // --- Call AI ---
-    const responseText = await callProvider(prompt, config);
+    const responseText = await withTimeout(callProvider(prompt, config), config.provider);
 
     // --- Parse & sanitize ---
     const cleanJson = extractJson(responseText);
@@ -276,6 +283,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("Diplomacy Chat Error:", error);
 
+    const status = error instanceof LLMTimeoutError ? 504 : 500;
     return NextResponse.json(
       {
         message:
@@ -284,7 +292,7 @@ export async function POST(req: NextRequest) {
         relationChange: null,
         error: error instanceof Error ? error.message : "Internal Server Error",
       },
-      { status: 500 }
+      { status }
     );
   }
 }

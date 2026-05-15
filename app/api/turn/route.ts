@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
 import { buildGameMasterPrompt } from "@/lib/ai-prompts";
+import { LLMTimeoutError, withTimeout } from "@/lib/llm-timeout";
 import { callLocalAI } from "@/lib/local-ai";
 import { getClientIp,rateLimit } from "@/lib/rate-limit";
 
@@ -158,6 +159,19 @@ export async function POST(req: NextRequest) {
   try {
     const { command, gameState, config, history, events, relations, provinceSummary, storySoFar, promptOverrides } = await req.json();
 
+    if (typeof command !== "string" || command.trim().length === 0) {
+      return NextResponse.json({ error: "Command is required" }, { status: 400 });
+    }
+    if (command.length > 2000) {
+      return NextResponse.json(
+        { error: "Command is too long (max 2000 characters)" },
+        { status: 400 },
+      );
+    }
+    if (!config || typeof config.provider !== "string") {
+      return NextResponse.json({ error: "Provider config is required" }, { status: 400 });
+    }
+
     if (config.provider !== "local" && config.provider !== "free-ai" && !config.apiKey) {
       return NextResponse.json({ error: "API Key missing" }, { status: 400 });
     }
@@ -178,11 +192,14 @@ export async function POST(req: NextRequest) {
 
     switch (config.provider) {
       case "local": {
-        responseText = await callLocalAI({
-          provider: config.model || "claude",
-          prompt: systemPrompt,
-          systemPrompt: "You are a JSON-only response bot for a grand strategy game. Never explain your answer, only return valid JSON.",
-        });
+        responseText = await withTimeout(
+          callLocalAI({
+            provider: config.model || "claude",
+            prompt: systemPrompt,
+            systemPrompt: "You are a JSON-only response bot for a grand strategy game. Never explain your answer, only return valid JSON.",
+          }),
+          "local",
+        );
         break;
       }
       case "google": {
@@ -194,7 +211,7 @@ export async function POST(req: NextRequest) {
             model: modelName,
             generationConfig: { responseMimeType: "application/json" },
           });
-          const result = await model.generateContent(systemPrompt);
+          const result = await withTimeout(model.generateContent(systemPrompt), "google");
           return result.response.text();
         };
 
@@ -225,10 +242,13 @@ export async function POST(req: NextRequest) {
           baseURL: process.env.FREE_AI_GATEWAY_URL || "https://free-ai-gateway.sarthakagrawal927.workers.dev/v1",
           defaultHeaders: { "x-gateway-project-id": "open-historia" },
         });
-        const freeAiCompletion = await gateway.chat.completions.create({
-          messages: [{ role: "system", content: systemPrompt }],
-          model: normalizeFreeAiModel(config.model),
-        });
+        const freeAiCompletion = await withTimeout(
+          gateway.chat.completions.create({
+            messages: [{ role: "system", content: systemPrompt }],
+            model: normalizeFreeAiModel(config.model),
+          }),
+          "free-ai",
+        );
         responseText = freeAiCompletion.choices[0].message.content || "{}";
         break;
       }
@@ -237,36 +257,45 @@ export async function POST(req: NextRequest) {
           apiKey: config.apiKey,
           baseURL: "https://api.deepseek.com",
         });
-        const completion = await deepseek.chat.completions.create({
-          messages: [{ role: "system", content: systemPrompt }],
-          model: config.model,
-        });
+        const completion = await withTimeout(
+          deepseek.chat.completions.create({
+            messages: [{ role: "system", content: systemPrompt }],
+            model: config.model,
+          }),
+          "deepseek",
+        );
         responseText = completion.choices[0].message.content || "{}";
         break;
       }
       case "openai": {
         const openai = new OpenAI({ apiKey: config.apiKey });
         const isOSeries = config.model.startsWith("o");
-        const completion = await openai.chat.completions.create({
-          messages: [{ role: isOSeries ? "user" : "system", content: systemPrompt }],
-          model: config.model,
-          response_format:
-            config.model.includes("gpt-4o") || config.model.includes("o3")
-              ? { type: "json_object" }
-              : undefined,
-        });
+        const completion = await withTimeout(
+          openai.chat.completions.create({
+            messages: [{ role: isOSeries ? "user" : "system", content: systemPrompt }],
+            model: config.model,
+            response_format:
+              config.model.includes("gpt-4o") || config.model.includes("o3")
+                ? { type: "json_object" }
+                : undefined,
+          }),
+          "openai",
+        );
         responseText = completion.choices[0].message.content || "{}";
         break;
       }
       case "anthropic": {
         const anthropic = new Anthropic({ apiKey: config.apiKey });
-        const message = await anthropic.messages.create({
-          model: config.model,
-          max_tokens: 2048,
-          system:
-            "You are a JSON-only response bot for a grand strategy game. Never explain your answer, only return valid JSON.",
-          messages: [{ role: "user", content: systemPrompt }],
-        });
+        const message = await withTimeout(
+          anthropic.messages.create({
+            model: config.model,
+            max_tokens: 2048,
+            system:
+              "You are a JSON-only response bot for a grand strategy game. Never explain your answer, only return valid JSON.",
+            messages: [{ role: "user", content: systemPrompt }],
+          }),
+          "anthropic",
+        );
         if (message.content[0].type === "text") {
           responseText = message.content[0].text;
         }
@@ -288,12 +317,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(sanitized);
   } catch (error) {
     console.error("AI Error:", error);
+    const status = error instanceof LLMTimeoutError ? 504 : 500;
     return NextResponse.json(
       {
         message: `The Game Master encountered an error: ${error instanceof Error ? error.message : "Internal Server Error"}`,
         updates: [],
       },
-      { status: 500 }
+      { status }
     );
   }
 }
