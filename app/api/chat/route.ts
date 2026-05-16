@@ -93,6 +93,23 @@ const extractJson = (text: string): string => {
   );
 };
 
+// Only keys consumed by buildDiplomacyPrompt are accepted; everything else is dropped.
+const DIPLOMACY_OVERRIDE_KEYS = ["diplomacyInstructions"] as const;
+const MAX_OVERRIDE_LENGTH = 4000;
+
+const sanitizePromptOverrides = (raw: unknown): Record<string, string> | undefined => {
+  if (!raw || typeof raw !== "object") return undefined;
+  const source = raw as Record<string, unknown>;
+  const out: Record<string, string> = {};
+  for (const key of DIPLOMACY_OVERRIDE_KEYS) {
+    const value = source[key];
+    if (typeof value === "string" && value.length > 0 && value.length <= MAX_OVERRIDE_LENGTH) {
+      out[key] = value;
+    }
+  }
+  return Object.keys(out).length > 0 ? out : undefined;
+};
+
 // ---------------------------------------------------------------------------
 // AI provider dispatch
 // ---------------------------------------------------------------------------
@@ -226,7 +243,7 @@ export async function POST(req: NextRequest) {
       relations,
       recentEvents,
       config,
-      promptOverrides,
+      promptOverrides: rawPromptOverrides,
     } = body as {
       message: string;
       playerNation: string;
@@ -236,8 +253,10 @@ export async function POST(req: NextRequest) {
       relations?: { type: string; treaties: string[] } | null;
       recentEvents?: Array<{ year: number; description: string }>;
       config: { provider: string; apiKey: string; model: string };
-      promptOverrides?: Record<string, string>;
+      promptOverrides?: unknown;
     };
+
+    const promptOverrides = sanitizePromptOverrides(rawPromptOverrides);
 
     // --- Validation ---
     if (config?.provider !== "local" && config?.provider !== "free-ai" && !config?.apiKey) {
