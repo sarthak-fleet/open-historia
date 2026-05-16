@@ -12,6 +12,8 @@ import { useTurnProcessing } from "@/hooks/useTurnProcessing";
 import type { LogEntry } from "@/lib/game-storage";
 import type { DiplomaticRelation,GameConfig } from "@/lib/types";
 
+import { MapLoadingState, MapUnavailableState } from "@/components/MapShell";
+
 // All heavy components loaded client-side only to avoid SSR issues
 const MapView = dynamic(() => import("@/components/MapView"), { ssr: false });
 const DiplomacyChat = dynamic(() => import("@/components/DiplomacyChat"), { ssr: false });
@@ -184,13 +186,17 @@ export default function GameClient({ initialGameId }: { initialGameId?: string }
   // ── Render ──
 
   if (game.loading) {
+    return <MapLoadingState />;
+  }
+
+  // World topology failed to load (or returned empty) — show a polished
+  // fallback that still explains the situation instead of a blank map.
+  if (game.provincesCache.length === 0) {
     return (
-      <div className="flex items-center justify-center h-screen bg-slate-950 text-slate-400 font-mono">
-        <div className="text-center">
-          <div className="animate-pulse text-lg mb-2">Loading World Data...</div>
-          <div className="text-xs text-slate-600">Initializing satellite uplink</div>
-        </div>
-      </div>
+      <MapUnavailableState
+        error={game.worldLoadError}
+        onRetry={game.retryWorldLoad}
+      />
     );
   }
 

@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 
 import { authClient } from "@/lib/auth-client";
+import { captureAuthFailure } from "@/lib/foundry-monitoring";
 
 interface AuthModalProps {
   open: boolean;
@@ -51,12 +52,32 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
     setLoading(true);
 
     try {
-      await authClient.signIn.social({
+      const result = await authClient.signIn.social({
         provider: "google",
         callbackURL: window.location.pathname,
       });
+      if (result?.error) {
+        const message = result.error.message ?? "Google sign-in failed";
+        captureAuthFailure({
+          projectSlug: "open-historia",
+          provider: "google",
+          stage: "signin",
+          reason: message,
+          source: "auth-modal",
+        });
+        setError(message);
+        setLoading(false);
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      const message = err instanceof Error ? err.message : "Something went wrong";
+      captureAuthFailure({
+        projectSlug: "open-historia",
+        provider: "google",
+        stage: "signin",
+        reason: message,
+        source: "auth-modal",
+      });
+      setError(message);
       setLoading(false);
     }
   };

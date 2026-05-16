@@ -430,6 +430,9 @@ export default function MapView({
 
   // Tier 3 lazy loading
   const [tier3GeoJSON, setTier3GeoJSON] = useState<FeatureCollection | null>(null);
+  const [tier3Status, setTier3Status] = useState<
+    "idle" | "loading" | "error"
+  >("idle");
   const tier3LoadedRef = useRef(false);
 
   // ---------------------------------------------------------------------------
@@ -484,6 +487,29 @@ export default function MapView({
   );
 
   const citiesGeoJSON = useMemo(() => buildCitiesGeoJSON(), []);
+
+  // Ocean / sea labels — purely cosmetic, anchored to fixed centroids so
+  // the empty blue space reads as an atlas instead of dead pixels.
+  const oceansGeoJSON = useMemo<FeatureCollection>(
+    () => ({
+      type: "FeatureCollection",
+      features: [
+        { name: "PACIFIC OCEAN", coords: [-150, 5] },
+        { name: "ATLANTIC OCEAN", coords: [-30, 10] },
+        { name: "INDIAN OCEAN", coords: [75, -25] },
+        { name: "ARCTIC OCEAN", coords: [0, 78] },
+        { name: "SOUTHERN OCEAN", coords: [30, -65] },
+        { name: "Mediterranean Sea", coords: [18, 36] },
+        { name: "South China Sea", coords: [115, 13] },
+        { name: "Caribbean Sea", coords: [-75, 15] },
+      ].map((f) => ({
+        type: "Feature" as const,
+        geometry: { type: "Point" as const, coordinates: f.coords },
+        properties: { name: f.name, major: f.name === f.name.toUpperCase() ? 1 : 0 },
+      })),
+    }),
+    []
+  );
 
   const warBorderGeoJSON = useMemo(
     () => buildRelationBorderGeoJSON(provinces, warPairs),
@@ -655,19 +681,25 @@ export default function MapView({
     const zoom = mapRef.current?.getZoom();
     if (zoom && zoom >= 5) {
       tier3LoadedRef.current = true;
+      setTier3Status("loading");
       fetch("/admin1-detail.json")
-        .then((res) => res.json())
+        .then((res) => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.json();
+        })
         .then((topoData) => {
-           
+
           const geo = topojson.feature(
             topoData,
             topoData.objects.states
           ) as unknown as FeatureCollection;
           setTier3GeoJSON(geo);
+          setTier3Status("idle");
         })
         .catch((err) => {
           console.error("Failed to load tier 3 data:", err);
           tier3LoadedRef.current = false;
+          setTier3Status("error");
         });
     }
   }, []);
@@ -1189,6 +1221,44 @@ export default function MapView({
                   3, ["case", [">=", ["get", "population"], 30], 1, 0],
                   4, ["case", [">=", ["get", "population"], 10], 1, 0],
                   5, 1,
+                ],
+              }}
+            />
+          </Source>
+
+          {/* ── Ocean / Sea Labels ── */}
+          <Source id="oceans" type="geojson" data={oceansGeoJSON}>
+            <Layer
+              id="ocean-labels"
+              type="symbol"
+              layout={{
+                "text-field": ["get", "name"],
+                "text-font": ["Open Sans Bold"],
+                "text-size": [
+                  "case",
+                  ["==", ["get", "major"], 1],
+                  ["interpolate", ["linear"], ["zoom"], 1, 11, 4, 16],
+                  ["interpolate", ["linear"], ["zoom"], 2, 9, 5, 12],
+                ],
+                "text-letter-spacing": [
+                  "case",
+                  ["==", ["get", "major"], 1],
+                  0.35,
+                  0.1,
+                ],
+                "text-allow-overlap": false,
+                "text-padding": 4,
+              }}
+              paint={{
+                "text-color": "rgba(148,184,220,0.55)",
+                "text-halo-color": "rgba(0,0,0,0.55)",
+                "text-halo-width": 1,
+                "text-opacity": [
+                  "interpolate", ["linear"], ["zoom"],
+                  0, ["case", ["==", ["get", "major"], 1], 0.8, 0],
+                  3, ["case", ["==", ["get", "major"], 1], 0.7, 0.6],
+                  6, 0.4,
+                  7, 0,
                 ],
               }}
             />

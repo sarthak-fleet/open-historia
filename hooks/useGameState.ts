@@ -16,7 +16,7 @@ import {
 import { INITIAL_PLAYERS } from "@/lib/map-generator";
 import type { GameConfig } from "@/lib/types";
 import type { GameEvent, GameState, MapTheme, Preset,Province } from "@/lib/types";
-import { loadWorldData } from "@/lib/world-loader";
+import { loadWorldDataDetailed } from "@/lib/world-loader";
 
 function uid(): string {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -34,6 +34,14 @@ export function useGameState(initialGameId?: string) {
   const [selectedPreset, setSelectedPreset] = useState<Preset | null>(null);
   const [savedGames, setSavedGames] = useState<SavedGame[]>([]);
   const [savesLoading, setSavesLoading] = useState(false);
+  const [worldLoadError, setWorldLoadError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
+
+  const retryWorldLoad = useCallback(() => {
+    setLoading(true);
+    setWorldLoadError(null);
+    setReloadKey((k) => k + 1);
+  }, []);
 
   // Auth
   const { data: authSession } = authClient.useSession();
@@ -64,8 +72,9 @@ export function useGameState(initialGameId?: string) {
 
   useEffect(() => {
     async function load() {
-      const data = await loadWorldData();
+      const { provinces: data, error } = await loadWorldDataDetailed();
       setProvincesCache(data);
+      setWorldLoadError(error);
       await refreshSavedGames();
 
       if (initialGameId) {
@@ -90,7 +99,7 @@ export function useGameState(initialGameId?: string) {
       setLoading(false);
     }
     load();
-  }, [refreshSavedGames, initialGameId]);
+  }, [refreshSavedGames, initialGameId, reloadKey]);
 
   // Preset selection
   const handleSelectPreset = useCallback((preset: Preset) => {
@@ -238,6 +247,8 @@ export function useGameState(initialGameId?: string) {
     savedGames,
     savesLoading,
     authSession,
+    worldLoadError,
+    retryWorldLoad,
 
     // Initial restore data
     initialLogs,

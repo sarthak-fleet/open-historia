@@ -157,10 +157,25 @@ function countryColor(isoCode: string): string {
   return `hsl(${Math.round(hue)}, 35%, 28%)`;
 }
 
+export type WorldLoadResult = {
+  provinces: Province[];
+  error: string | null;
+};
+
 export async function loadWorldData(): Promise<Province[]> {
+  const { provinces } = await loadWorldDataDetailed();
+  return provinces;
+}
+
+export async function loadWorldDataDetailed(): Promise<WorldLoadResult> {
   try {
     const response = await fetch("/provinces-combined.json");
-    if (!response.ok) throw new Error("Failed to load map data");
+    if (!response.ok) {
+      return {
+        provinces: [],
+        error: `Map data could not be loaded (HTTP ${response.status}). The /provinces-combined.json asset may be missing from this deployment.`,
+      };
+    }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const topology: any = await response.json();
@@ -231,9 +246,10 @@ export async function loadWorldData(): Promise<Province[]> {
       };
     });
 
-    return provinces;
+    return { provinces, error: null };
   } catch (error) {
     console.error("Map loading error:", error);
-    return [];
+    const message = error instanceof Error ? error.message : "Unknown error while loading the world map.";
+    return { provinces: [], error: message };
   }
 }
