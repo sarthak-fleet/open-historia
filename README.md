@@ -9,6 +9,20 @@ Open Historia is a unique strategy game where you command nations using natural 
 
 ---
 
+## Deployment & External Services
+
+| Concern | Service |
+|---------|---------|
+| Hosting | Cloudflare Workers (`open-historia`) via `@opennextjs/cloudflare` |
+| Database | Turso (libSQL) via Drizzle ORM |
+| Auth | better-auth + Google OAuth |
+| AI | free-ai-gateway (Workers AI chokepoint); Anthropic, OpenAI & Google Gemini APIs supported |
+| CI/CD | GitHub Actions — auto-deploy to Cloudflare on push to `main` (PRs get preview workers) |
+
+Rate limiting on AI routes uses a Cloudflare Workers `RATE_LIMITER` binding (see `wrangler.toml`).
+
+---
+
 ## Problem
 
 Traditional grand strategy games require complex menu navigation, steep learning curves, and rigid rule systems. Players spend more time managing UIs than making strategic decisions. Open Historia removes these barriers by letting you command nations the way a real leader would - through natural language - while AI handles the complexity of simulation and world response.

@@ -16,7 +16,7 @@ AI grand-strategy history game — players issue natural language commands to co
 - Auth: better-auth (Google OAuth + Drizzle adapter)
 - AI: Anthropic, OpenAI, Google Gemini, DeepSeek, local (multi-provider)
 - Testing: None configured
-- Deploy: Vercel
+- Deploy: Cloudflare Workers (`open-historia`) via @opennextjs/cloudflare
 - Package manager: pnpm
 
 ## Repo structure
