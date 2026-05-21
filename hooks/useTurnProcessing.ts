@@ -3,6 +3,7 @@
 import { useCallback,useState } from "react";
 
 import { loadPromptOverrides } from "@/components/PromptSettings";
+import { trackActivated, trackCoreAction } from "@/lib/analytics";
 import type { LogEntry } from "@/lib/game-storage";
 import type { GameConfig } from "@/lib/types";
 import type {
@@ -96,7 +97,35 @@ export function useTurnProcessing(deps: {
           }),
         });
 
-        const data = await res.json();
+        let data: {
+          message?: string;
+          updates?: unknown[];
+          storySoFar?: string;
+          error?: string;
+        };
+        try {
+          data = await res.json();
+        } catch {
+          // Non-JSON body (e.g. an HTML error page from an upstream proxy).
+          data = {};
+        }
+
+        if (!res.ok) {
+          // The server already guarantees `updates` is empty on failure, so the
+          // game state is never corrupted — surface a clear, retryable message.
+          const reason =
+            data.message ||
+            data.error ||
+            (res.status === 429
+              ? "Too many commands too quickly — wait a moment and retry."
+              : res.status === 504
+                ? "The Game Master took too long to respond. No changes were applied — try again."
+                : res.status === 502
+                  ? "The Game Master returned an unreadable response. No changes were applied — try again."
+                  : "The Game Master is unavailable right now. No changes were applied — try again.");
+          addLog(reason, "error");
+          return;
+        }
 
         if (data.message) {
           addLog(data.message, "info");
@@ -105,6 +134,11 @@ export function useTurnProcessing(deps: {
         if (data.storySoFar) {
           setStorySoFar(data.storySoFar);
         }
+
+        // Owner-facing analytics — the Game Master successfully processed a
+        // turn. `activated` is de-duplicated to a once-per-user milestone.
+        trackActivated();
+        trackCoreAction("turn_advanced");
 
         let hasSignificantEvent = false;
         const turnEvents: string[] = [];

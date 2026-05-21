@@ -2,6 +2,7 @@
 
 import { useCallback,useEffect, useState } from "react";
 
+import { trackCoreAction } from "@/lib/analytics";
 import type { LogEntry } from "@/lib/game-storage";
 import { autoSave, saveGame } from "@/lib/game-storage";
 import type { GameConfig, GameEvent, GameState } from "@/lib/types";
@@ -61,6 +62,7 @@ export function useSaveLoad(deps: {
       setShowSaveNotif(true);
       setTimeout(() => setShowSaveNotif(false), 2000);
       await refreshSavedGames();
+      trackCoreAction("game_saved");
       addLog("Game saved.", "success");
     } catch (error) {
       addLog(

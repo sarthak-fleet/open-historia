@@ -8,6 +8,7 @@ import { buildGameMasterPrompt } from "@/lib/ai-prompts";
 import { LLMTimeoutError, withTimeout } from "@/lib/llm-timeout";
 import { callLocalAI } from "@/lib/local-ai";
 import { getClientIp,rateLimit } from "@/lib/rate-limit";
+import { parseAiTurnResponse } from "@/lib/turn-parser";
 
 // ---------------------------------------------------------------------------
 // Constants & Helpers
@@ -44,103 +45,11 @@ const isModelSelectionError = (error: unknown) => {
 };
 
 // ---------------------------------------------------------------------------
-// Update types -- expanded to include "relation", "economy", and "crisis"
+// AI turn-response parsing (extraction + sanitization) lives in
+// `@/lib/turn-parser` so it can be unit-tested in isolation. Malformed or
+// invalid AI output must never corrupt game state — that contract is enforced
+// there and covered by `lib/__tests__/turn-parser.test.ts`.
 // ---------------------------------------------------------------------------
-
-type ParsedUpdate =
-  | { type: "owner"; provinceName: string; newOwnerId: string }
-  | { type: "time"; amount: number }
-  | { type: "event"; description: string; eventType: "diplomacy" | "war" | "discovery" | "flavor" | "economy" | "crisis"; year: number }
-  | { type: "relation"; nationA: string; nationB: string; relationType: string; reason: string };
-
-const normalizeEventType = (
-  eventType: unknown
-): "diplomacy" | "war" | "discovery" | "flavor" | "economy" | "crisis" => {
-  if (
-    eventType === "diplomacy" ||
-    eventType === "war" ||
-    eventType === "discovery" ||
-    eventType === "flavor" ||
-    eventType === "economy" ||
-    eventType === "crisis"
-  ) {
-    return eventType;
-  }
-  return "flavor";
-};
-
-const sanitizeAiPayload = (
-  payload: unknown,
-  fallbackYear: number
-): { message: string; updates: ParsedUpdate[]; storySoFar?: string } => {
-  const safePayload = (payload && typeof payload === "object" ? payload : {}) as {
-    message?: unknown;
-    updates?: unknown;
-    storySoFar?: unknown;
-  };
-
-  const message =
-    typeof safePayload.message === "string" && safePayload.message.trim()
-      ? safePayload.message.trim()
-      : "The world watches your move. Issue your next command.";
-
-  const updates: ParsedUpdate[] = [];
-  if (Array.isArray(safePayload.updates)) {
-    safePayload.updates.forEach((update) => {
-      if (!update || typeof update !== "object") return;
-      const u = update as Record<string, unknown>;
-
-      if (u.type === "owner" && typeof u.provinceName === "string" && typeof u.newOwnerId === "string") {
-        updates.push({
-          type: "owner",
-          provinceName: u.provinceName.trim(),
-          newOwnerId: u.newOwnerId.trim(),
-        });
-      }
-
-      if (u.type === "time") {
-        const rawAmount = typeof u.amount === "number" ? u.amount : Number(u.amount);
-        if (Number.isFinite(rawAmount)) {
-          updates.push({
-            type: "time",
-            amount: Math.trunc(rawAmount),
-          });
-        }
-      }
-
-      if (u.type === "event" && typeof u.description === "string") {
-        const rawYear = typeof u.year === "number" ? u.year : Number(u.year);
-        updates.push({
-          type: "event",
-          description: u.description.trim(),
-          eventType: normalizeEventType(u.eventType),
-          year: Number.isFinite(rawYear) ? Math.trunc(rawYear) : fallbackYear,
-        });
-      }
-
-      if (
-        u.type === "relation" &&
-        typeof u.nationA === "string" &&
-        typeof u.nationB === "string" &&
-        typeof u.relationType === "string"
-      ) {
-        updates.push({
-          type: "relation",
-          nationA: u.nationA.trim(),
-          nationB: u.nationB.trim(),
-          relationType: u.relationType.trim(),
-          reason: typeof u.reason === "string" ? u.reason.trim() : "",
-        });
-      }
-    });
-  }
-
-  const storySoFar = typeof safePayload.storySoFar === "string" && safePayload.storySoFar.trim()
-    ? safePayload.storySoFar.trim()
-    : undefined;
-
-  return { message, updates, storySoFar };
-};
 
 // ---------------------------------------------------------------------------
 // POST /api/turn
@@ -305,16 +214,21 @@ export async function POST(req: NextRequest) {
         throw new Error(`Unsupported provider: ${config.provider}`);
     }
 
-    // Robust JSON cleaning
-    const cleanJson =
-      responseText
-        .replace(/```json/g, "")
-        .replace(/```/g, "")
-        .match(/(\{[\s\S]*\})/)?.[1] || responseText.trim();
-
-    const parsed = JSON.parse(cleanJson);
-    const sanitized = sanitizeAiPayload(parsed, gameState.turn);
-    return NextResponse.json(sanitized);
+    // Extraction + sanitization never throw: malformed / invalid AI output
+    // yields a safe payload with `updates: []` so game state is never corrupted.
+    const fallbackYear =
+      gameState && typeof gameState.turn === "number" ? gameState.turn : 0;
+    const parsedTurn = parseAiTurnResponse(responseText, fallbackYear);
+    return NextResponse.json(
+      {
+        message: parsedTurn.message,
+        updates: parsedTurn.updates,
+        storySoFar: parsedTurn.storySoFar,
+      },
+      // 502: upstream AI produced unusable output. Empty `updates` keeps the
+      // client's game state intact; the client surfaces `message` to the user.
+      { status: parsedTurn.parseError ? 502 : 200 },
+    );
   } catch (error) {
     console.error("AI Error:", error);
     const status = error instanceof LLMTimeoutError ? 504 : 500;

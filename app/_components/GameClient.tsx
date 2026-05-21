@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import React, { useCallback,useEffect, useRef, useState } from "react";
 
+import { trackCoreAction } from "@/lib/analytics";
 import { useAdvisor } from "@/hooks/useAdvisor";
 import { useDiplomacy } from "@/hooks/useDiplomacy";
 import { useGameState } from "@/hooks/useGameState";
@@ -114,6 +115,9 @@ export default function GameClient({ initialGameId }: { initialGameId?: string }
     (config: GameConfig) => {
       const gameId = game.handleStartGame(config);
       save.setGameId(gameId);
+
+      // Owner-facing analytics — a new game session was begun.
+      trackCoreAction("game_started");
 
       // Reset subsystem state
       diplomacy.setChatThreads([]);
@@ -359,7 +363,10 @@ export default function GameClient({ initialGameId }: { initialGameId?: string }
       {/* Top Bar */}
       {gameState && (
         <div className="absolute top-0 left-0 w-full p-2 bg-gradient-to-b from-slate-950/90 to-transparent pointer-events-none flex justify-center items-center gap-8 text-slate-200 font-mono text-lg z-10">
-          <div className="bg-slate-900/80 px-4 py-2 rounded-full border border-slate-700 backdrop-blur pointer-events-auto flex items-center gap-4">
+          {/* On narrow screens the control pill exceeds the viewport — let it
+              scroll inside itself (max-w-full + overflow-x-auto) so it never
+              forces horizontal scroll on the whole page. */}
+          <div className="max-w-full overflow-x-auto bg-slate-900/80 px-3 py-2 sm:px-4 rounded-full border border-slate-700 backdrop-blur pointer-events-auto flex items-center gap-3 sm:gap-4">
             <div className={yearFlash ? "animate-flash-border rounded px-1 -mx-1" : ""}>
               <span className="text-slate-500 text-sm uppercase mr-2">Year</span>
               <span className="font-bold">{gameState.turn}</span>
