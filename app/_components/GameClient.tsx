@@ -23,6 +23,7 @@ const GameSetup = dynamic(() => import("@/components/GameSetup"), { ssr: false }
 const CommandTerminal = dynamic(() => import("@/components/CommandTerminal"), { ssr: false });
 const Timeline = dynamic(() => import("@/components/Timeline"), { ssr: false });
 const Advisor = dynamic(() => import("@/components/Advisor"), { ssr: false });
+const StoryPath = dynamic(() => import("@/components/StoryPath"), { ssr: false });
 const RelationsPanel = dynamic(() => import("@/components/RelationsPanel"), { ssr: false });
 const PromptSettings = dynamic(() => import("@/components/PromptSettings"), { ssr: false });
 
@@ -93,6 +94,7 @@ export default function GameClient({ initialGameId }: { initialGameId?: string }
     logs: turn.logs,
     events: turn.events,
     storySoFar: turn.storySoFar,
+    completedStepIds: turn.completedStepIds,
     addLog: turn.addLog,
     refreshSavedGames: game.refreshSavedGames,
     initialGameIdLoaded: game.initialGameIdLoaded,
@@ -107,8 +109,9 @@ export default function GameClient({ initialGameId }: { initialGameId?: string }
       turn.setLogs(game.initialLogs);
       turn.setEvents(game.initialEvents);
       turn.setStorySoFar(game.initialStorySoFar);
+      turn.setCompletedStepIds(game.initialCompletedStepIds);
     }
-  }, [game.initialLogs, game.initialEvents, game.initialStorySoFar, turn]);
+  }, [game.initialLogs, game.initialEvents, game.initialStorySoFar, game.initialCompletedStepIds, turn]);
 
   // ── Game start handler (bridges game + turn + diplomacy + advisor state) ──
   const handleStartGame = useCallback(
@@ -133,6 +136,7 @@ export default function GameClient({ initialGameId }: { initialGameId?: string }
       ]);
       turn.setEvents([]);
       turn.setStorySoFar("");
+      turn.setCompletedStepIds([]);
       setRelations([]);
     },
     [game, save, diplomacy, advisor, timeline, turn]
@@ -148,6 +152,7 @@ export default function GameClient({ initialGameId }: { initialGameId?: string }
       }
       turn.setEvents(result.events);
       turn.setStorySoFar(result.storySoFar);
+      turn.setCompletedStepIds(result.completedStepIds);
       turn.setLogs([
         ...result.logs,
         { id: uid(), type: "success" as LogEntry["type"], text: `Loaded save from ${new Date(Date.now()).toLocaleString()}.` },
@@ -166,6 +171,7 @@ export default function GameClient({ initialGameId }: { initialGameId?: string }
     turn.setLogs([]);
     turn.setEvents([]);
     turn.setStorySoFar("");
+    turn.setCompletedStepIds([]);
     turn.setPendingOrders([]);
     diplomacy.setChatThreads([]);
     setRelations([]);
@@ -231,6 +237,7 @@ export default function GameClient({ initialGameId }: { initialGameId?: string }
         preset={
           game.selectedPreset
             ? {
+                id: game.selectedPreset.id,
                 year: game.selectedPreset.year,
                 scenario: game.selectedPreset.scenario,
                 difficulty: game.selectedPreset.difficulty,
@@ -325,6 +332,15 @@ export default function GameClient({ initialGameId }: { initialGameId?: string }
           processing={advisor.processingAdvisor}
           playerNation={gameState.players["player"].name}
           currentYear={gameState.turn}
+        />
+      )}
+
+      {/* Story Path (top-left) */}
+      {gameState && game.selectedPreset?.storyPath && (
+        <StoryPath
+          storyPath={game.selectedPreset.storyPath}
+          currentTurn={gameState.turn}
+          completedStepIds={turn.completedStepIds}
         />
       )}
 

@@ -20,6 +20,7 @@ export function useSaveLoad(deps: {
   logs: LogEntry[];
   events: GameEvent[];
   storySoFar: string;
+  completedStepIds: string[];
   addLog: (text: string, type?: LogEntry["type"]) => void;
   refreshSavedGames: () => Promise<void>;
   initialGameIdLoaded: string | null;
@@ -30,6 +31,7 @@ export function useSaveLoad(deps: {
     logs,
     events,
     storySoFar,
+    completedStepIds,
     addLog,
     refreshSavedGames,
     initialGameIdLoaded,
@@ -57,7 +59,7 @@ export function useSaveLoad(deps: {
         setCurrentGameId(id);
         window.history.replaceState(null, "", `/${id}`);
       }
-      await saveGame(gameState, gameConfig, logs, id, events, storySoFar);
+      await saveGame(gameState, gameConfig, logs, id, events, storySoFar, completedStepIds);
       setLastSaveTime(Date.now());
       setShowSaveNotif(true);
       setTimeout(() => setShowSaveNotif(false), 2000);
@@ -70,7 +72,7 @@ export function useSaveLoad(deps: {
         "error"
       );
     }
-  }, [gameState, gameConfig, logs, events, storySoFar, currentGameId, refreshSavedGames, addLog]);
+  }, [gameState, gameConfig, logs, events, storySoFar, completedStepIds, currentGameId, refreshSavedGames, addLog]);
 
   const handleSaveAndExit = useCallback(async (): Promise<void> => {
     if (!gameState || !gameConfig) return;
@@ -93,8 +95,8 @@ export function useSaveLoad(deps: {
   // Auto-save
   useEffect(() => {
     if (!gameState || !gameConfig) return;
-    autoSave(gameState, gameConfig, logs, events, 2000, currentGameId || "autosave", storySoFar);
-  }, [gameState, gameConfig, logs, events, currentGameId, storySoFar]);
+    autoSave(gameState, gameConfig, logs, events, 2000, currentGameId || "autosave", storySoFar, completedStepIds);
+  }, [gameState, gameConfig, logs, events, currentGameId, storySoFar, completedStepIds]);
 
   return {
     currentGameId,

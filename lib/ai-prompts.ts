@@ -119,9 +119,10 @@ export function buildGameMasterPrompt(args: {
   relations?: Array<{ nationA: string; nationB: string; type: string; treaties: string[] }>;
   provinceSummary?: Array<{ name: string; ownerId: string | null }>;
   storySoFar?: string;
+  completedStepIds?: string[];
   promptOverrides?: Partial<PromptOverrides>;
 }): string {
-  const { command, gameState, config, history, events, relations, provinceSummary, storySoFar, promptOverrides } = args;
+  const { command, gameState, config, history, events, relations, provinceSummary, storySoFar, completedStepIds, promptOverrides } = args;
   const playerNation = gameState.players["player"]?.name ?? "Unknown";
 
   const overrides = {
@@ -132,6 +133,10 @@ export function buildGameMasterPrompt(args: {
   const storyBlock = storySoFar
     ? `STORY SO FAR (compressed history of this entire game — this is your primary memory):\n${storySoFar}`
     : "STORY SO FAR: Game just started. No prior history.";
+
+  let guidedStoryBlock = "";
+  // We'll pass the story path info if available. This requires passing it through the API call.
+  // For now, I'll add a placeholder and update the call site.
 
   return `${overrides.gameMasterPreamble}
 
@@ -161,11 +166,12 @@ OUTPUT: Return EXACTLY one raw JSON object. No markdown fences. No text outside 
   "updates": [
     { "type": "owner", "provinceName": "EXACT province name from territory list", "newOwnerId": "player or ai_id" },
     { "type": "event", "description": "Concise event for the log", "eventType": "war|diplomacy|discovery|flavor|economy|crisis", "year": ${gameState.turn} },
-    { "type": "relation", "nationA": "Nation Name", "nationB": "Nation Name", "relationType": "neutral|friendly|allied|hostile|war|vassal", "reason": "Brief reason" }
+    { "type": "relation", "nationA": "Nation Name", "nationB": "Nation Name", "relationType": "neutral|friendly|allied|hostile|war|vassal", "reason": "Brief reason" },
+    { "type": "storyStep", "stepId": "id_of_completed_step", "message": "Achievement message" }
   ],
   "storySoFar": "Updated compressed narrative of the ENTIRE game so far (max 500 words). Include: all wars and their outcomes, all alliances/treaties, territory changes, major diplomatic shifts, ongoing conflicts, economic developments, and the player's strategic arc. This is your memory — anything not included here will be forgotten. Append new developments to the existing story, don't rewrite from scratch."
 }
-Only include updates that actually occur. Empty updates = []. Include an "event" for anything noteworthy. provinceName MUST match exactly. ALWAYS include "storySoFar" — this is critical for continuity.`;
+Only include updates that actually occur. Empty updates = []. Include an "event" for anything noteworthy. provinceName MUST match exactly. ALWAYS include "storySoFar" — this is critical for continuity. If a guided story step is completed, include a "storyStep" update with its ID.`;
 }
 
 // 2. DIPLOMACY CHAT PROMPT

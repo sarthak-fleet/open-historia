@@ -104,6 +104,11 @@ describe("sanitizeAiPayload — happy path", () => {
             relationType: " war ",
             reason: " border dispute ",
           },
+          {
+            type: "storyStep",
+            stepId: " step1 ",
+            message: " Goal reached! "
+          }
         ],
       },
       FALLBACK_YEAR,
@@ -127,6 +132,11 @@ describe("sanitizeAiPayload — happy path", () => {
         relationType: "war",
         reason: "border dispute",
       },
+      {
+        type: "storyStep",
+        stepId: "step1",
+        message: "Goal reached!"
+      }
     ]);
   });
 });

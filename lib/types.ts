@@ -11,6 +11,7 @@ export interface GameConfig {
   provider: Provider;
   model: string;
   difficulty: "Sandbox" | "Easy" | "Realistic" | "Hardcore" | "Impossible";
+  presetId?: string;
 }
 
 export type Player = {
@@ -78,6 +79,22 @@ export type ChatThread = {
 };
 
 // Presets
+export type StoryStep = {
+  id: string;
+  year: number;
+  title: string;
+  description: string;
+  objective: string;
+  hint: string;
+};
+
+export type StoryPath = {
+  id: string;
+  name: string;
+  description: string;
+  steps: StoryStep[];
+};
+
 export type Preset = {
   id: string;
   name: string;
@@ -88,6 +105,7 @@ export type Preset = {
   suggestedNations: string[];
   category: "historical" | "modern" | "alternate" | "fictional";
   icon: string;
+  storyPath?: StoryPath;
 };
 
 // Timeline / Rewind

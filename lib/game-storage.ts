@@ -29,11 +29,12 @@ export interface SavedGame {
   logs: LogEntry[];
   events: GameEvent[];
   storySoFar?: string;
+  completedStepIds?: string[];
   version: string;
 }
 
 const STORAGE_KEY = "open_historia_saves";
-const VERSION = "3.0.0";
+const VERSION = "3.1.0";
 
 const toProvinceKey = (id: string | number) => String(id);
 
@@ -143,7 +144,8 @@ export function localSaveGame(
   logs: LogEntry[],
   saveName?: string,
   events: GameEvent[] = [],
-  storySoFar?: string
+  storySoFar?: string,
+  completedStepIds?: string[]
 ): string {
   try {
     const saves = localListSavedGames();
@@ -158,6 +160,7 @@ export function localSaveGame(
       logs: logs.slice(-50),
       events: events.slice(-100),
       storySoFar,
+      completedStepIds,
       version: VERSION,
     };
 
@@ -206,6 +209,7 @@ export function localListSavedGames(): SavedGame[] {
         logs: Array.isArray(save.logs) ? (save.logs as LogEntry[]) : [],
         events: Array.isArray(save.events) ? (save.events as GameEvent[]) : [],
         storySoFar: typeof save.storySoFar === "string" ? save.storySoFar : undefined,
+        completedStepIds: Array.isArray(save.completedStepIds) ? (save.completedStepIds as string[]) : undefined,
         version: typeof save.version === "string" ? save.version : "1.0.0",
       }));
 
@@ -276,6 +280,7 @@ export function importSavedGame(parsed: unknown): string {
     logs: Array.isArray(candidate.logs) ? (candidate.logs as LogEntry[]).slice(-50) : [],
     events: Array.isArray(candidate.events) ? (candidate.events as GameEvent[]).slice(-100) : [],
     storySoFar: typeof candidate.storySoFar === "string" ? candidate.storySoFar : undefined,
+    completedStepIds: Array.isArray(candidate.completedStepIds) ? (candidate.completedStepIds as string[]) : undefined,
   };
 
   const saves = localListSavedGames().filter((s) => s.id !== save.id);
@@ -294,7 +299,8 @@ async function cloudSaveGame(
   logs: LogEntry[],
   saveName?: string,
   events: GameEvent[] = [],
-  storySoFar?: string
+  storySoFar?: string,
+  completedStepIds?: string[]
 ): Promise<string> {
   const id = saveName || createSaveId();
   const res = await fetch("/api/saves", {
@@ -309,6 +315,7 @@ async function cloudSaveGame(
       logs: logs.slice(-50),
       events: events.slice(-100),
       storySoFar,
+      completedStepIds,
     }),
   });
   if (!res.ok) throw new Error(`Cloud save failed: ${res.status}`);
@@ -350,6 +357,7 @@ async function cloudLoadGame(id: string): Promise<SavedGame | null> {
     logs: save.logs || [],
     events: save.events || [],
     storySoFar: save.storySoFar,
+    completedStepIds: save.completedStepIds,
     version: save.version || "2.0.0",
   });
 }
@@ -376,6 +384,7 @@ async function cloudListSavedGames(): Promise<SavedGame[]> {
         logs: [],
         events: [],
         storySoFar: s.storySoFar as string | undefined,
+        completedStepIds: Array.isArray(s.completedStepIds) ? s.completedStepIds : undefined,
         version: (s.version as string) || "2.0.0",
       }) as SavedGame
   );
@@ -395,15 +404,16 @@ export async function saveGame(
   logs: LogEntry[],
   saveName?: string,
   events: GameEvent[] = [],
-  storySoFar?: string
+  storySoFar?: string,
+  completedStepIds?: string[]
 ): Promise<string> {
   // Always write to localStorage
-  const id = localSaveGame(gameState, gameConfig, logs, saveName, events, storySoFar);
+  const id = localSaveGame(gameState, gameConfig, logs, saveName, events, storySoFar, completedStepIds);
 
   // Also write to cloud if authenticated
   if (_authenticated) {
     try {
-      await cloudSaveGame(gameState, gameConfig, logs, saveName || id, events, storySoFar);
+      await cloudSaveGame(gameState, gameConfig, logs, saveName || id, events, storySoFar, completedStepIds);
     } catch (err) {
       console.error("Cloud save failed, localStorage fallback used:", err);
     }
@@ -493,14 +503,15 @@ export function autoSave(
   events: GameEvent[],
   delay: number = 2000,
   saveName: string = "autosave",
-  storySoFar?: string
+  storySoFar?: string,
+  completedStepIds?: string[]
 ): void {
   if (autoSaveTimer) {
     clearTimeout(autoSaveTimer);
   }
 
   autoSaveTimer = setTimeout(() => {
-    saveGame(gameState, gameConfig, logs, saveName, events, storySoFar).catch((err) => {
+    saveGame(gameState, gameConfig, logs, saveName, events, storySoFar, completedStepIds).catch((err) => {
       console.error("Auto-save failed:", err);
     });
   }, delay);

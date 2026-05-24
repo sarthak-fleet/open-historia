@@ -14,9 +14,11 @@ import {
   setAuthenticated,
 } from "@/lib/game-storage";
 import { INITIAL_PLAYERS } from "@/lib/map-generator";
-import type { GameConfig } from "@/lib/types";
+import { GameConfig } from "@/lib/types";
 import type { GameEvent, GameState, MapTheme, Preset,Province } from "@/lib/types";
 import { loadWorldDataDetailed } from "@/lib/world-loader";
+import { getPresetById } from "@/lib/presets";
+
 
 function uid(): string {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -68,6 +70,7 @@ export function useGameState(initialGameId?: string) {
   const [initialLogs, setInitialLogs] = useState<LogEntry[]>([]);
   const [initialEvents, setInitialEvents] = useState<GameEvent[]>([]);
   const [initialStorySoFar, setInitialStorySoFar] = useState("");
+  const [initialCompletedStepIds, setInitialCompletedStepIds] = useState<string[]>([]);
   const [initialGameIdLoaded, setInitialGameIdLoaded] = useState<string | null>(null);
 
   useEffect(() => {
@@ -82,10 +85,14 @@ export function useGameState(initialGameId?: string) {
         if (saved && data.length > 0) {
           const restoredState = restoreSavedGameState(saved, data);
           setGameConfig(saved.gameConfig);
+          if (saved.gameConfig.presetId) {
+            setSelectedPreset(getPresetById(saved.gameConfig.presetId) || null);
+          }
           setGameState(restoredState);
           setProvincesCache(restoredState.provinces);
           setInitialEvents(saved.events || []);
           setInitialStorySoFar(saved.storySoFar || "");
+          setInitialCompletedStepIds(saved.completedStepIds || []);
           setShowPresets(false);
           setInitialGameIdLoaded(initialGameId);
           const restoredLogs = saved.logs?.length ? saved.logs : [];
@@ -195,6 +202,7 @@ export function useGameState(initialGameId?: string) {
       provinces: Province[];
       events: GameEvent[];
       storySoFar: string;
+      completedStepIds: string[];
       logs: LogEntry[];
     } | null> => {
       const saved = await loadGame(saveId);
@@ -206,6 +214,9 @@ export function useGameState(initialGameId?: string) {
 
       const restoredState = restoreSavedGameState(saved, provincesCache);
       setGameConfig(saved.gameConfig);
+      if (saved.gameConfig.presetId) {
+        setSelectedPreset(getPresetById(saved.gameConfig.presetId) || null);
+      }
       setGameState(restoredState);
       setProvincesCache(restoredState.provinces);
       setShowPresets(false);
@@ -217,15 +228,16 @@ export function useGameState(initialGameId?: string) {
         provinces: restoredState.provinces,
         events: saved.events || [],
         storySoFar: saved.storySoFar || "",
+        completedStepIds: saved.completedStepIds || [],
         logs: saved.logs?.length ? saved.logs : [],
       };
     },
     [provincesCache, refreshSavedGames]
   );
 
-  // Nation label helper
   const getNationLabel = useCallback(
     (nationId: string) => {
+      if (!provincesCache || provincesCache.length === 0) return nationId;
       return provincesCache.find((p) => String(p.id) === String(nationId))?.name || nationId;
     },
     [provincesCache]
@@ -254,6 +266,7 @@ export function useGameState(initialGameId?: string) {
     initialLogs,
     initialEvents,
     initialStorySoFar,
+    initialCompletedStepIds,
     initialGameIdLoaded,
 
     // Actions

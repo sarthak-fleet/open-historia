@@ -48,6 +48,7 @@ export function useTurnProcessing(deps: {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [events, setEvents] = useState<GameEvent[]>([]);
   const [storySoFar, setStorySoFar] = useState("");
+  const [completedStepIds, setCompletedStepIds] = useState<string[]>([]);
 
   const addLog = useCallback((text: string, type: LogEntry["type"] = "info") => {
     setLogs((prev) => {
@@ -93,6 +94,7 @@ export function useTurnProcessing(deps: {
             relations,
             provinceSummary,
             storySoFar,
+            completedStepIds,
             promptOverrides: loadPromptOverrides(),
           }),
         });
@@ -242,6 +244,18 @@ export function useTurnProcessing(deps: {
               addLog(`${update.nationA} ↔ ${update.nationB}: ${relType}`, logType);
               turnEvents.push(`${update.nationA} & ${update.nationB} now ${relType}`);
             }
+
+            if (update.type === "storyStep") {
+              const stepId = (update as any).stepId as string;
+              const msg = (update as any).message as string;
+              setCompletedStepIds((prev) => {
+                if (prev.includes(stepId)) return prev;
+                return [...prev, stepId];
+              });
+              addLog(`STORY ACHIEVED: ${msg}`, "success");
+              hasSignificantEvent = true;
+              turnEvents.push(`Story Achievement: ${msg}`);
+            }
           });
         }
 
@@ -326,6 +340,8 @@ export function useTurnProcessing(deps: {
     setEvents,
     storySoFar,
     setStorySoFar,
+    completedStepIds,
+    setCompletedStepIds,
     addLog,
     queueOrder,
     handleNextTurn,

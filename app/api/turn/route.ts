@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { command, gameState, config, history, events, relations, provinceSummary, storySoFar, promptOverrides } = await req.json();
+    const { command, gameState, config, history, events, relations, provinceSummary, storySoFar, completedStepIds, promptOverrides } = await req.json();
 
     if (typeof command !== "string" || command.trim().length === 0) {
       return NextResponse.json({ error: "Command is required" }, { status: 400 });
@@ -94,6 +94,7 @@ export async function POST(req: NextRequest) {
       relations,
       provinceSummary,
       storySoFar,
+      completedStepIds,
       promptOverrides,
     });
 

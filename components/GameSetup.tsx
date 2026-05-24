@@ -11,7 +11,7 @@ interface GameSetupProps {
   provinces: Province[];
   onStartGame: (config: GameConfig) => void;
   onBack?: () => void;
-  preset?: { year: number; scenario: string; difficulty: string; suggestedNations: string[]; scenarioName?: string } | null;
+  preset?: { id?: string; year: number; scenario: string; difficulty: string; suggestedNations: string[]; scenarioName?: string } | null;
 }
 
 // Re-export for backward compatibility with existing imports
@@ -180,7 +180,7 @@ export default function GameSetup({ provinces, onStartGame, onBack, preset }: Ga
     if (!playerNationId || (!keyless && !k)) { alert("Please select a nation and provide an API Key."); return; }
     if (!scenarioValidation.canStart) { alert("Please resolve scenario contract errors before starting."); return; }
     persistProviderKey(provider, k, rememberKey);
-    onStartGame({ year, scenario, playerNationId, apiKey: k, provider, model, difficulty });
+    onStartGame({ year, scenario, playerNationId, apiKey: k, provider, model, difficulty, presetId: preset?.id });
   };
 
   const providerLabel = provider === "local" ? "Local AI (No Key)" : provider === "free-ai" ? "Free AI (No Key)" : provider === "deepseek" ? "DeepSeek" : provider === "google" ? "Google Gemini" : provider === "openai" ? "OpenAI" : "Anthropic Claude";

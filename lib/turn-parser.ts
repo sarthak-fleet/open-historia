@@ -32,6 +32,11 @@ export type ParsedUpdate =
       nationB: string;
       relationType: string;
       reason: string;
+    }
+  | {
+      type: "storyStep";
+      stepId: string;
+      message: string;
     };
 
 export interface SanitizedTurn {
@@ -160,6 +165,18 @@ export function sanitizeAiPayload(
           nationB: u.nationB.trim(),
           relationType: u.relationType.trim(),
           reason: typeof u.reason === "string" ? u.reason.trim() : "",
+        });
+      }
+
+      if (
+        u.type === "storyStep" &&
+        typeof u.stepId === "string" &&
+        u.stepId.trim()
+      ) {
+        updates.push({
+          type: "storyStep",
+          stepId: u.stepId.trim(),
+          message: typeof u.message === "string" ? u.message.trim() : "Story goal achieved!",
         });
       }
     }

@@ -22,6 +22,37 @@ export const PRESETS: Preset[] = [
     suggestedNations: ["Germany", "United Kingdom", "France", "USA", "Russia", "Japan", "Italy", "China", "Poland", "Canada"],
     category: "historical",
     icon: "war",
+    storyPath: {
+      id: "blitzkrieg",
+      name: "The Second World War: Early Stages",
+      description: "Guide your nation through the tumultuous opening years of the war, from the invasion of Poland to the Battle of Britain.",
+      steps: [
+        {
+          id: "poland-invasion",
+          year: 1939,
+          title: "The Invasion of Poland",
+          description: "Germany has invaded Poland. As a major power, you must formulate a response to this aggression.",
+          objective: "Respond to the invasion of Poland (e.g., 'Mobilize forces to defend Poland', 'Begin strategic bombing of German industrial centers').",
+          hint: "Direct military intervention in Poland is difficult, but you can begin to apply pressure elsewhere."
+        },
+        {
+          id: "battle-of-france",
+          year: 1940,
+          title: "The Fall of France",
+          description: "After a period of quiet known as the 'Phoney War', Germany has launched a surprise attack through the Ardennes, bypassing the Maginot Line and overwhelming French and British forces.",
+          objective: "Manage the evacuation from Dunkirk and establish a government-in-exile.",
+          hint: "Saving your army is more important than saving territory you've already lost."
+        },
+        {
+          id: "battle-of-britain",
+          year: 1940,
+          title: "Their Finest Hour",
+          description: "With France defeated, Britain stands alone. The German Luftwaffe is launching a massive air campaign to pave the way for an invasion.",
+          objective: "Defend British airspace and prevent a German invasion.",
+          hint: "Focus your resources on aircraft production and radar technology."
+        }
+      ]
+    }
   },
   {
     id: "cold-war-1962",
@@ -33,6 +64,37 @@ export const PRESETS: Preset[] = [
     suggestedNations: ["USA", "Russia", "Cuba", "United Kingdom", "France", "China", "Germany", "Turkey", "Brazil", "India"],
     category: "historical",
     icon: "nuke",
+    storyPath: {
+      id: "thirteen-days",
+      name: "Thirteen Days",
+      description: "Navigate the most dangerous crisis in human history. Every step brings you closer to either peace or total annihilation.",
+      steps: [
+        {
+          id: "discovery",
+          year: 1962,
+          title: "The Discovery",
+          description: "Nuclear missiles have been spotted in Cuba. You must decide how to respond before the missiles become operational.",
+          objective: "Issue a command to address the missile discovery (e.g., 'Declare a naval blockade of Cuba' or 'Demand Khrushchev remove the missiles').",
+          hint: "A 'quarantine' or blockade is less aggressive than an air strike but still shows resolve."
+        },
+        {
+          id: "escalation",
+          year: 1962,
+          title: "The Escalation",
+          description: "Tensions are at a breaking point. Soviet ships are approaching the blockade line. The world holds its breath.",
+          objective: "Manage the naval encounter or open a back-channel for negotiation.",
+          hint: "Back-channels (like the Scali-Fomin connection) can bypass the public posturing."
+        },
+        {
+          id: "resolution",
+          year: 1962,
+          title: "The Brink of Peace",
+          description: "A deal is on the table: missiles for missiles. Remove the Jupiter missiles from Turkey in exchange for the removal of missiles from Cuba.",
+          objective: "Finalize the agreement to end the crisis.",
+          hint: "The trade must be kept secret to avoid political fallout with NATO."
+        }
+      ]
+    }
   },
   {
     id: "rome-fall-476",
