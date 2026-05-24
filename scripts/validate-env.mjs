@@ -1,6 +1,6 @@
 import { spawnSync } from "node:child_process";
 
-const REQUIRED_WORKER_SECRETS = ["GOOGLE_MAPS_API_KEY"];
+const REQUIRED_WORKER_SECRETS = ["GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET"];
 
 function parseSecretNames(stdout) {
   try {

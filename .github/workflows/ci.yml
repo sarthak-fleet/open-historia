@@ -18,4 +18,6 @@ jobs:
           corepack enable
           corepack install
       - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm lint
+      - run: pnpm test
       - run: pnpm cf:build

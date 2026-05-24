@@ -166,16 +166,20 @@ graph TB
 ```bash
 git clone https://github.com/sarthakagrawal927/open-historia.git
 cd open-historia
-npm install
+pnpm install
 ```
 
 ### Running the Game
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000)
+
+> Note: `pnpm dev` also starts a small local AI bridge under `server/`. The
+> current dev script installs that subfolder's dependencies via `npm install`
+> automatically.
 
 ### How to Play
 
@@ -205,9 +209,9 @@ GOOGLE_CLIENT_SECRET=your-secret
 Then run database migrations:
 
 ```bash
-npm run db:generate  # Generate migrations
-npm run db:push      # Apply to Turso
-npm run db:studio    # Browse database
+pnpm db:generate  # Generate migrations
+pnpm db:push      # Apply to Turso
+pnpm db:studio    # Browse database
 ```
 
 **Note**: The game works fully offline with local saves if you skip this step.
