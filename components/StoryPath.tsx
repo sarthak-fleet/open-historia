@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import type { StoryPath, StoryStep } from "@/lib/types";
+import { PRESETS } from "@/lib/presets";
 
 interface StoryPathProps {
   storyPath: StoryPath;
@@ -193,7 +194,53 @@ export default function StoryPath({
             })}
           </ol>
         )}
+
+        {/* Source notes */}
+        {storyPath.sourceNotes && (
+          <p className="mt-3 text-[9px] text-slate-600 leading-snug border-t border-slate-800/60 pt-2">
+            {storyPath.sourceNotes}
+          </p>
+        )}
+
+        {/* Suggested next scenarios (shown when story is complete) */}
+        {allDone && storyPath.suggestedNext && storyPath.suggestedNext.length > 0 && (
+          <SuggestedNext ids={storyPath.suggestedNext} />
+        )}
       </div>
+    </div>
+  );
+}
+
+function SuggestedNext({ ids }: { ids: string[] }) {
+  const suggestions = ids
+    .map(id => PRESETS.find(p => p.id === id))
+    .filter(Boolean) as import("@/lib/types").Preset[];
+
+  if (suggestions.length === 0) return null;
+
+  return (
+    <div className="mt-3 border-t border-emerald-900/40 pt-2">
+      <p className="text-[9px] text-emerald-500/80 uppercase tracking-wider mb-1.5">
+        Play next
+      </p>
+      <ul className="space-y-1.5">
+        {suggestions.map(preset => (
+          <li key={preset.id} className="flex gap-1.5 items-start">
+            <span className="text-emerald-500/60 text-[9px] mt-0.5 shrink-0">▸</span>
+            <div className="min-w-0">
+              <p className="text-slate-300 text-[10px] font-bold leading-tight truncate">
+                {preset.name}
+              </p>
+              <p className="text-slate-600 text-[9px] leading-snug line-clamp-2">
+                {preset.description}
+              </p>
+            </div>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-2 text-[9px] text-slate-700">
+        Start a new game to play these scenarios.
+      </p>
     </div>
   );
 }

@@ -93,6 +93,8 @@ export type StoryPath = {
   name: string;
   description: string;
   steps: StoryStep[];
+  sourceNotes?: string;
+  suggestedNext?: string[];
 };
 
 export type Preset = {

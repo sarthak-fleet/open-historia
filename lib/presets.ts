@@ -26,6 +26,8 @@ export const PRESETS: Preset[] = [
       id: "blitzkrieg",
       name: "The Second World War: Early Stages",
       description: "Guide your nation through the tumultuous opening years of the war, from the invasion of Poland to the Battle of Britain.",
+      sourceNotes: "Based on: Shirer, The Rise and Fall of the Third Reich (1960); Beevor, The Second World War (2012); Churchill, The Second World War memoirs.",
+      suggestedNext: ["ww1-1914", "cold-war-1962", "napoleon-1799"],
       steps: [
         {
           id: "poland-invasion",
@@ -68,6 +70,8 @@ export const PRESETS: Preset[] = [
       id: "thirteen-days",
       name: "Thirteen Days",
       description: "Navigate the most dangerous crisis in human history. Every step brings you closer to either peace or total annihilation.",
+      sourceNotes: "Based on: Kennedy, Thirteen Days: A Memoir of the Cuban Missile Crisis (1969); Allison & Zelikow, Essence of Decision (1999); declassified ExComm transcripts.",
+      suggestedNext: ["ww2-1939", "modern-2026", "ai-awakening-2030"],
       steps: [
         {
           id: "discovery",
@@ -128,6 +132,39 @@ export const PRESETS: Preset[] = [
     suggestedNations: ["United Kingdom", "France", "Germany", "Russia", "Austria", "Turkey", "Italy", "USA", "Japan", "Serbia"],
     category: "historical",
     icon: "war",
+    storyPath: {
+      id: "war-to-end-wars",
+      name: "The War to End All Wars",
+      description: "Steer your nation through the catastrophic opening of the 20th century's first global conflict — from the July Crisis to the trenches of the Western Front.",
+      sourceNotes: "Based on: MacMillan, The War That Ended Peace (2013); Keegan, The First World War (1998); Tuchman, The Guns of August (1962).",
+      suggestedNext: ["ww2-1939", "napoleon-1799", "renaissance-1453"],
+      steps: [
+        {
+          id: "july-crisis",
+          year: 1914,
+          title: "The July Crisis",
+          description: "The assassination of Archduke Franz Ferdinand has set off a diplomatic crisis. Austria-Hungary is issuing ultimatums. The alliance system is about to activate like a chain reaction.",
+          objective: "Issue a diplomatic response to the assassination crisis (e.g., 'Reject Austria's ultimatum and mobilize forces' or 'Urge Austria to accept arbitration').",
+          hint: "Every major power assumed the war would be short. Mobilization timetables made de-escalation almost impossible once armies started moving."
+        },
+        {
+          id: "western-front",
+          year: 1915,
+          title: "The Trenches",
+          description: "The war of movement has ground to a halt. From Switzerland to the English Channel, a continuous line of trenches has been dug. The Schlieffen Plan has failed. Millions are now locked in industrial attrition warfare.",
+          objective: "Develop a strategy to break the stalemate (e.g., 'Launch a major offensive at Verdun', 'Deploy new poison gas weapons', 'Open a new front at Gallipoli').",
+          hint: "Technological innovation — tanks, aircraft, artillery coordination — will eventually crack the stalemate, but at enormous cost."
+        },
+        {
+          id: "armistice",
+          year: 1918,
+          title: "The Final Push",
+          description: "After years of attrition, the German Spring Offensive has failed. American troops are arriving in force. Revolution is spreading. The Central Powers are collapsing from within.",
+          objective: "Bring the war to an end (e.g., 'Accept armistice terms', 'Push for a final offensive before negotiations', 'Support democratic reforms to stabilize Germany').",
+          hint: "The terms of peace will shape the next generation — too harsh and you plant the seeds of the next war."
+        }
+      ]
+    },
   },
   {
     id: "napoleon-1799",
@@ -139,6 +176,39 @@ export const PRESETS: Preset[] = [
     suggestedNations: ["France", "United Kingdom", "Austria", "Russia", "Spain", "Germany", "Italy", "Netherlands", "Turkey", "Egypt"],
     category: "historical",
     icon: "crown",
+    storyPath: {
+      id: "age-of-napoleon",
+      name: "The Age of Napoleon",
+      description: "From coup to empire to exile — navigate the rise and peak of Napoleonic Europe and the revolutionary ideals that reshaped the world.",
+      sourceNotes: "Based on: Roberts, Napoleon: A Life (2014); Schom, Napoleon Bonaparte (1997); Chandler, The Campaigns of Napoleon (1966).",
+      suggestedNext: ["ww1-1914", "renaissance-1453", "exploration-1492"],
+      steps: [
+        {
+          id: "coup-brumaire",
+          year: 1799,
+          title: "The Coup of 18 Brumaire",
+          description: "Napoleon has seized power from the Directory. France is exhausted by revolution and war. He must now consolidate authority and present himself as the savior of the Republic.",
+          objective: "Consolidate Napoleon's grip on power (e.g., 'Negotiate the Concordat with the Pope', 'Reform the legal code', 'Sign the Treaty of Amiens with Britain').",
+          hint: "Napoleon's genius was making enemies accept peace on his terms — each victory bought France time to reform."
+        },
+        {
+          id: "empire",
+          year: 1804,
+          title: "Emperor of the French",
+          description: "Napoleon has crowned himself Emperor. The Continental System is strangling British trade. Europe's old monarchies view him as an existential threat to their legitimacy.",
+          objective: "Establish French dominance over Europe (e.g., 'Defeat Austria and Prussia at Austerlitz', 'Install relatives as kings of dependent states', 'Expand the Continental Blockade').",
+          hint: "The Continental System was double-edged — it hurt Britain but devastated French allies and sowed resentment across Europe."
+        },
+        {
+          id: "grand-coalition",
+          year: 1805,
+          title: "The Grand Coalition",
+          description: "Britain, Austria, Prussia, Russia, and Sweden have united against France. The campaign of 1805 will determine whether Napoleon's empire survives or the old order is restored.",
+          objective: "Defeat the Coalition and impose a lasting peace on Europe (e.g., 'March on Vienna', 'Destroy the Russian army at Austerlitz', 'Offer peace terms to Austria').",
+          hint: "Napoleon's strength was speed and decisive battle — avoid protracted sieges and let his corps system outmaneuver larger but slower enemy armies."
+        }
+      ]
+    },
   },
   {
     id: "zombie-2026",
