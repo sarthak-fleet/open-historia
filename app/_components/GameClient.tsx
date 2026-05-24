@@ -252,6 +252,7 @@ export default function GameClient({ initialGameId }: { initialGameId?: string }
 
   // Phase 3: Main game
   const { gameState } = game;
+  const timelineBarHeight = 140;
 
   return (
     <main className="relative w-screen h-screen overflow-hidden bg-slate-950 text-slate-100">
@@ -283,7 +284,7 @@ export default function GameClient({ initialGameId }: { initialGameId?: string }
       )}
 
       {/* Command Terminal + Advance Button (bottom-left) */}
-      <div style={{ position: "absolute", bottom: timeline.timelineSnapshots.length > 0 ? 140 : 16, left: 16, zIndex: 20 }}>
+      <div style={{ position: "absolute", bottom: timelineBarHeight, left: 16, zIndex: 20 }}>
         <CommandTerminal logs={turn.logs} onCommand={turn.queueOrder} processing={turn.processingTurn} />
         {/* Inline advance bar below terminal */}
         <div className="mt-1 flex items-center gap-2 bg-slate-900/90 border border-slate-700 rounded px-2 py-1.5 backdrop-blur font-mono">
@@ -314,15 +315,13 @@ export default function GameClient({ initialGameId }: { initialGameId?: string }
         </div>
       </div>
 
-      {/* Timeline (bottom) */}
-      {timeline.timelineSnapshots.length > 0 && (
-        <Timeline
-          snapshots={timeline.timelineSnapshots}
-          currentYear={gameState?.turn || 0}
-          onRewind={timeline.handleTimelineRewind}
-          onBranch={timeline.handleTimelineBranch}
-        />
-      )}
+      {/* Timeline (bottom) — always visible during gameplay for empty-state guidance */}
+      <Timeline
+        snapshots={timeline.timelineSnapshots}
+        currentYear={gameState?.turn || 0}
+        onRewind={timeline.handleTimelineRewind}
+        onBranch={timeline.handleTimelineBranch}
+      />
 
       {/* Advisor (floating) */}
       {gameState && (
@@ -348,7 +347,7 @@ export default function GameClient({ initialGameId }: { initialGameId?: string }
       {gameState && relations.length > 0 && (
         <div
           className="absolute right-4 z-20"
-          style={{ bottom: timeline.timelineSnapshots.length > 0 ? 140 : 16 }}
+          style={{ bottom: timelineBarHeight }}
         >
           <RelationsPanel
             relations={relations}

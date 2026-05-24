@@ -33,6 +33,38 @@ const NODE_COLORS: Record<string, { fill: string; glow: string; badge: string }>
   default:   { fill: "bg-slate-400",   glow: "shadow-slate-400/40",   badge: "text-slate-400" },
 };
 
+const EVENT_TYPE_STYLES: Record<GameEvent["type"], { badge: string; border: string }> = {
+  war:       { badge: "text-rose-400",    border: "border-rose-500/30" },
+  crisis:    { badge: "text-rose-400",    border: "border-rose-500/30" },
+  diplomacy: { badge: "text-sky-400",     border: "border-sky-500/30" },
+  discovery: { badge: "text-emerald-400", border: "border-emerald-500/30" },
+  economy:   { badge: "text-amber-400",   border: "border-amber-500/30" },
+  flavor:    { badge: "text-slate-400",   border: "border-slate-600/50" },
+};
+
+function clampHorizontal(centerX: number, panelWidth: number, padding = 12): number {
+  if (typeof window === "undefined") return centerX;
+  const half = panelWidth / 2;
+  return Math.max(padding + half, Math.min(window.innerWidth - padding - half, centerX));
+}
+
+function EventCard({ event, compact = false }: { event: GameEvent; compact?: boolean }) {
+  const style = EVENT_TYPE_STYLES[event.type];
+  return (
+    <div className={`rounded border ${style.border} bg-slate-950/50 px-2 py-1 ${compact ? "" : "mb-1 last:mb-0"}`}>
+      <div className="flex items-center gap-1.5 mb-0.5">
+        <span className={`text-[8px] uppercase font-bold tracking-wide ${style.badge}`}>
+          {event.type}
+        </span>
+        <span className="text-slate-600 text-[8px]">Y{event.year}</span>
+      </div>
+      <p className={`text-slate-300 leading-snug ${compact ? "text-[10px] line-clamp-2" : "text-[11px]"}`}>
+        {event.description}
+      </p>
+    </div>
+  );
+}
+
 function truncate(text: string, max: number): string {
   if (text.length <= max) return text;
   return text.slice(0, max - 1) + "\u2026";
@@ -117,7 +149,11 @@ function buildBranches(snapshots: TimelineSnapshot[]): BranchInfo[] {
 // Component
 // ---------------------------------------------------------------------------
 
-const NODE_SPACING = 140;
+const ZOOM_LEVELS: Record<"compact" | "normal" | "wide", number> = {
+  compact: 70,
+  normal: 140,
+  wide: 220,
+};
 const NODE_RADIUS = 7;
 const CURRENT_RADIUS = 11;
 const BRANCH_VERTICAL_GAP = 26;
@@ -132,6 +168,11 @@ export default function Timeline({
   const [collapsed, setCollapsed] = useState(false);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [zoom, setZoom] = useState<"compact" | "normal" | "wide">(() => {
+    if (typeof window !== "undefined" && window.innerWidth < 640) return "compact";
+    return "normal";
+  });
+  const nodeSpacing = ZOOM_LEVELS[zoom];
   const scrollRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
   const dragStart = useRef({ x: 0, scrollLeft: 0 });
@@ -162,7 +203,7 @@ export default function Timeline({
 
       branch.nodeIds.forEach((nid, posIdx) => {
         map.set(nid, {
-          x: startX + posIdx * NODE_SPACING + NODE_SPACING, // 1-indexed offset
+          x: startX + posIdx * nodeSpacing + nodeSpacing, // 1-indexed offset
           y,
           branchIdx: bIdx,
           posIdx,
@@ -171,27 +212,49 @@ export default function Timeline({
     });
 
     return map;
-  }, [branches]);
+  }, [branches, nodeSpacing]);
 
   const totalWidth = useMemo(() => {
     let max = 0;
     layout.forEach((pos) => {
       if (pos.x > max) max = pos.x;
     });
-    return max + NODE_SPACING;
-  }, [layout]);
+    return max + nodeSpacing;
+  }, [layout, nodeSpacing]);
 
-  // Auto-scroll to the current node when it changes
-  useEffect(() => {
-    if (!scrollRef.current || !currentSnapshotId) return;
-    const pos = layout.get(currentSnapshotId);
+  const scrollToSnapshot = useCallback((snapshotId: string) => {
+    if (!scrollRef.current) return;
+    const pos = layout.get(snapshotId);
     if (!pos) return;
-
     scrollRef.current.scrollTo({
       left: pos.x - scrollRef.current.clientWidth / 2,
       behavior: "smooth",
     });
-  }, [currentSnapshotId, layout]);
+  }, [layout]);
+
+  // Auto-scroll to the current node when it changes (or when zoom changes)
+  useEffect(() => {
+    if (!currentSnapshotId) return;
+    scrollToSnapshot(currentSnapshotId);
+  }, [currentSnapshotId, scrollToSnapshot, zoom]);
+
+  // Keyboard navigation through primary branch when timeline is focused
+  const stepThroughPrimary = useCallback(
+    (direction: 1 | -1) => {
+      if (!primaryBranch || primaryBranch.nodeIds.length === 0) return;
+      const focusedId = activeId ?? hoveredId ?? currentSnapshotId;
+      const ids = primaryBranch.nodeIds;
+      const idx = focusedId ? ids.indexOf(focusedId) : ids.length - 1;
+      const nextIdx = Math.max(0, Math.min(ids.length - 1, idx + direction));
+      const nextId = ids[nextIdx];
+      if (nextId) {
+        setHoveredId(nextId);
+        setActiveId(null);
+        scrollToSnapshot(nextId);
+      }
+    },
+    [primaryBranch, activeId, hoveredId, currentSnapshotId, scrollToSnapshot]
+  );
 
   // Drag-to-scroll handlers
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -248,12 +311,37 @@ export default function Timeline({
         ) : (
           <div
             ref={scrollRef}
-            className="overflow-x-auto overflow-y-visible cursor-grab"
+            className="overflow-x-auto overflow-y-visible cursor-grab outline-none"
             style={{ height: "120px" }}
+            tabIndex={0}
+            role="region"
+            aria-label="History timeline — use left/right arrows to step through turns"
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
+            onKeyDown={(e) => {
+              if (e.key === "ArrowRight") {
+                e.preventDefault();
+                stepThroughPrimary(1);
+              } else if (e.key === "ArrowLeft") {
+                e.preventDefault();
+                stepThroughPrimary(-1);
+              } else if (e.key === "Home") {
+                e.preventDefault();
+                const first = primaryBranch?.nodeIds[0];
+                if (first) {
+                  setHoveredId(first);
+                  scrollToSnapshot(first);
+                }
+              } else if (e.key === "End") {
+                e.preventDefault();
+                if (currentSnapshotId) {
+                  setHoveredId(currentSnapshotId);
+                  scrollToSnapshot(currentSnapshotId);
+                }
+              }
+            }}
           >
             {/* SVG track layer for lines and branch connectors */}
             <div className="relative" style={{ width: totalWidth, height: 120 }}>
@@ -381,9 +469,69 @@ export default function Timeline({
           </div>
         )}
 
-        {/* Current year indicator in top-right of timeline bar */}
-        <div className="absolute top-2 right-3 flex items-center gap-3">
-          <span className="text-slate-500 text-[10px] uppercase tracking-wider">
+        {/* Controls + current year indicator in top-right of timeline bar */}
+        <div className="absolute top-2 right-3 flex items-center gap-2 sm:gap-3">
+          {snapshots.length > 0 && (
+            <>
+              <div className="flex items-center gap-0.5 bg-slate-900/80 border border-slate-700 rounded">
+                <button
+                  onClick={() => stepThroughPrimary(-1)}
+                  className="px-1.5 py-0.5 text-slate-400 hover:text-amber-400 text-[11px] leading-none disabled:opacity-30"
+                  title="Previous turn (←)"
+                  aria-label="Previous turn"
+                  disabled={!primaryBranch || primaryBranch.nodeIds.length <= 1}
+                >
+                  ◀
+                </button>
+                <button
+                  onClick={() => stepThroughPrimary(1)}
+                  className="px-1.5 py-0.5 text-slate-400 hover:text-amber-400 text-[11px] leading-none border-l border-slate-700 disabled:opacity-30"
+                  title="Next turn (→)"
+                  aria-label="Next turn"
+                  disabled={!primaryBranch || primaryBranch.nodeIds.length <= 1}
+                >
+                  ▶
+                </button>
+              </div>
+              <div className="flex items-center gap-0.5 bg-slate-900/80 border border-slate-700 rounded">
+                <button
+                  onClick={() =>
+                    setZoom((z) => (z === "wide" ? "normal" : z === "normal" ? "compact" : "compact"))
+                  }
+                  className="px-1.5 py-0.5 text-slate-400 hover:text-amber-400 text-[11px] leading-none disabled:opacity-30"
+                  title="Zoom out"
+                  aria-label="Zoom timeline out"
+                  disabled={zoom === "compact"}
+                >
+                  −
+                </button>
+                <span className="px-1 text-[9px] text-slate-500 border-l border-r border-slate-700 uppercase tracking-wider">
+                  {zoom}
+                </span>
+                <button
+                  onClick={() =>
+                    setZoom((z) => (z === "compact" ? "normal" : z === "normal" ? "wide" : "wide"))
+                  }
+                  className="px-1.5 py-0.5 text-slate-400 hover:text-amber-400 text-[11px] leading-none disabled:opacity-30"
+                  title="Zoom in"
+                  aria-label="Zoom timeline in"
+                  disabled={zoom === "wide"}
+                >
+                  +
+                </button>
+              </div>
+              {currentSnapshotId && (
+                <button
+                  onClick={() => scrollToSnapshot(currentSnapshotId)}
+                  className="px-2 py-0.5 bg-slate-900/80 border border-slate-700 text-slate-400 hover:text-amber-400 text-[10px] leading-none rounded uppercase tracking-wider"
+                  title="Jump to current turn"
+                >
+                  Now
+                </button>
+              )}
+            </>
+          )}
+          <span className="text-slate-500 text-[10px] uppercase tracking-wider hidden sm:inline">
             Current
           </span>
           <span className="text-amber-400 font-bold text-sm">
@@ -411,14 +559,17 @@ export default function Timeline({
           ? snapshots.find((candidate) => candidate.id === snap.parentSnapshotId)
           : null;
         const diff = diffTimelineSnapshots(parentSnapshot, snap);
+        const popoverWidth = typeof window !== "undefined" && window.innerWidth < 640 ? Math.min(320, window.innerWidth - 16) : 320;
+        const tooltipWidth = typeof window !== "undefined" && window.innerWidth < 640 ? Math.min(224, window.innerWidth - 16) : 224;
 
         // Action popover (on click, non-current nodes)
         if (activeId === snap.id) {
           return (
             <div
-              className="fixed w-80 bg-slate-900/95 border border-slate-600 rounded-lg p-3 shadow-2xl backdrop-blur-lg z-[60]"
+              className="fixed bg-slate-900/95 border border-slate-600 rounded-lg p-3 shadow-2xl backdrop-blur-lg z-[60] max-h-[min(70vh,28rem)] overflow-y-auto animate-scale-in"
               style={{
-                left: screenX,
+                width: popoverWidth,
+                left: clampHorizontal(screenX, popoverWidth),
                 bottom: window.innerHeight - screenY + 12,
                 transform: "translateX(-50%)",
               }}
@@ -471,13 +622,16 @@ export default function Timeline({
               </div>
 
               {diff.newEvents.length > 0 && (
-                <div className="rounded border border-slate-700 bg-slate-950/60 p-2 mb-2">
+                <div className="rounded border border-slate-700 bg-slate-950/60 p-2 mb-2 space-y-1">
                   <div className="text-slate-500 text-[9px] uppercase mb-1">New events</div>
                   {diff.newEvents.slice(0, 3).map((event) => (
-                    <div key={event.id} className="text-[10px] text-slate-400 truncate">
-                      {event.description}
-                    </div>
+                    <EventCard key={event.id} event={event} compact />
                   ))}
+                  {diff.newEvents.length > 3 && (
+                    <div className="text-[10px] text-slate-600 pt-0.5">
+                      +{diff.newEvents.length - 3} more
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -522,9 +676,10 @@ export default function Timeline({
         if (hoveredId === snap.id && !activeId) {
           return (
             <div
-              className="fixed w-56 bg-slate-900/95 border border-slate-600 rounded-lg p-3 shadow-2xl backdrop-blur-lg pointer-events-none z-[60]"
+              className="fixed bg-slate-900/95 border border-slate-600 rounded-lg p-3 shadow-2xl backdrop-blur-lg pointer-events-none z-[60] animate-fade-in"
               style={{
-                left: screenX,
+                width: tooltipWidth,
+                left: clampHorizontal(screenX, tooltipWidth),
                 bottom: window.innerHeight - screenY + 12,
                 transform: "translateX(-50%)",
               }}
@@ -544,21 +699,16 @@ export default function Timeline({
                 &gt; {truncate(snap.command, 40)}
               </div>
               {snap.gameStateSlim.events.length > 0 && (
-                <div className="border-t border-slate-700 pt-1.5 mt-1.5">
+                <div className="border-t border-slate-700 pt-1.5 mt-1.5 space-y-1">
                   <div className="text-slate-500 text-[9px] uppercase mb-1">
                     Events
                   </div>
-                  {snap.gameStateSlim.events.slice(0, 3).map((evt, i) => (
-                    <div
-                      key={i}
-                      className="text-slate-400 text-[10px] truncate"
-                    >
-                      {evt.description}
-                    </div>
+                  {snap.gameStateSlim.events.slice(0, 2).map((evt) => (
+                    <EventCard key={evt.id} event={evt} compact />
                   ))}
-                  {snap.gameStateSlim.events.length > 3 && (
+                  {snap.gameStateSlim.events.length > 2 && (
                     <div className="text-slate-600 text-[9px]">
-                      +{snap.gameStateSlim.events.length - 3} more
+                      +{snap.gameStateSlim.events.length - 2} more
                     </div>
                   )}
                 </div>
