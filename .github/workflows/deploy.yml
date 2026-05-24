@@ -57,6 +57,7 @@ jobs:
       - uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || '7d048325699a5acddb44d3be31cf6ba9' }}
           command: deploy
       - name: Smoke check production worker
         run: curl --fail --silent --show-error --location --max-time 30 https://open-historia.sarthakagrawal927.workers.dev >/dev/null
@@ -82,6 +83,7 @@ jobs:
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || '7d048325699a5acddb44d3be31cf6ba9' }}
           command: deploy --name open-historia-pr-${{ github.event.number }}
       - name: Comment preview URL on PR
         uses: actions/github-script@v7
@@ -101,4 +103,5 @@ jobs:
       - uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || '7d048325699a5acddb44d3be31cf6ba9' }}
           command: delete --name open-historia-pr-${{ github.event.number }} --force
