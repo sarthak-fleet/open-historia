@@ -1,0 +1,12 @@
+packages:
+  - "."
+
+onlyBuiltDependencies:
+  - esbuild
+  - sharp
+  - workerd
+
+ignoredBuiltDependencies:
+  - core-js
+  - protobufjs
+  - unrs-resolver
