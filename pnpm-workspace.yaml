@@ -10,3 +10,11 @@ ignoredBuiltDependencies:
   - core-js
   - protobufjs
   - unrs-resolver
+
+allowBuilds:
+  core-js: false
+  esbuild: true
+  protobufjs: false
+  sharp: true
+  unrs-resolver: false
+  workerd: true
