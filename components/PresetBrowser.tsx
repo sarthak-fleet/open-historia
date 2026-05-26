@@ -274,6 +274,10 @@ export default function PresetBrowser({
   const [showAuthModal, setShowAuthModal] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Sample timeline proof — one concrete historical thread shown on the landing
+  // so first-time visitors can see the shape of a run before picking anything.
+  const sampleTimeline = PRESETS.find((p) => p.id === "ww2-1939");
+
   // Staggered mount animation
   useEffect(() => {
     const t1 = setTimeout(() => setHeaderVisible(true), 80);
@@ -363,6 +367,68 @@ export default function PresetBrowser({
           {/* Decorative rule */}
           <div className="mx-auto mt-5 w-48 h-px bg-gradient-to-r from-transparent via-amber-700/40 to-transparent" />
         </header>
+
+        {/* ----------------------------------------------------------------- */}
+        {/* Sample timeline proof                                             */}
+        {/* ----------------------------------------------------------------- */}
+        {sampleTimeline?.storyPath && (
+          <section
+            aria-label="Sample historical timeline"
+            className={`shrink-0 px-4 sm:px-6 pb-4 transition-all duration-700 ease-out ${headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+          >
+            <div className="max-w-3xl mx-auto rounded-2xl border border-amber-700/30 bg-slate-900/60 backdrop-blur-sm px-5 sm:px-7 py-5">
+              <div className="flex items-start justify-between gap-4 flex-wrap">
+                <div className="min-w-0">
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-amber-500/80 font-bold">
+                    Sample timeline
+                  </p>
+                  <h2 className="mt-1 text-lg sm:text-xl font-serif text-slate-100">
+                    {sampleTimeline.storyPath.name}
+                  </h2>
+                  <p className="mt-1 text-xs text-slate-500 max-w-xl">
+                    A real, sourced historical thread you can rewind, branch, or rewrite.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => onSelectPreset(sampleTimeline)}
+                  className="shrink-0 inline-flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-widest text-slate-950 bg-amber-500 hover:bg-amber-400 rounded-lg transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                >
+                  Start exploring
+                  <span aria-hidden="true">&rarr;</span>
+                </button>
+              </div>
+
+              <ol className="mt-4 relative border-l border-amber-700/30 pl-5 space-y-3">
+                {sampleTimeline.storyPath.steps.map((step) => (
+                  <li key={step.id} className="relative">
+                    <span
+                      className="absolute -left-[27px] top-1.5 w-2.5 h-2.5 rounded-full bg-amber-500 ring-2 ring-slate-900"
+                      aria-hidden="true"
+                    />
+                    <div className="flex items-baseline gap-2 flex-wrap">
+                      <span className="text-[11px] font-mono text-amber-400">
+                        {step.year}
+                      </span>
+                      <span className="text-sm font-bold text-slate-200">
+                        {step.title}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">
+                      {step.description}
+                    </p>
+                  </li>
+                ))}
+              </ol>
+
+              {sampleTimeline.storyPath.sourceNotes && (
+                <p className="mt-3 text-[10px] text-slate-600 italic">
+                  {sampleTimeline.storyPath.sourceNotes}
+                </p>
+              )}
+            </div>
+          </section>
+        )}
 
         {/* ----------------------------------------------------------------- */}
         {/* Category tabs                                                     */}
