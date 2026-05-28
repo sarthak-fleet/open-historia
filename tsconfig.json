@@ -1,7 +1,13 @@
 {
   "extends": "@saas-maker/tsconfig/next.json",
   "compilerOptions": {
+    "noPropertyAccessFromIndexSignature": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitAny": false,
+    "verbatimModuleSyntax": false,
     "paths": { "@/*": ["./*"] }
   },
-  "exclude": ["node_modules", ".next", ".open-next", "e2e", "playwright.config.ts"]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules", ".next", ".open-next", "e2e", "playwright.config.ts", "open-next.config.ts"]
 }

@@ -59,7 +59,6 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
       if (result?.error) {
         const message = result.error.message ?? "Google sign-in failed";
         captureAuthFailure({
-          projectSlug: "open-historia",
           provider: "google",
           stage: "signin",
           reason: message,
@@ -71,7 +70,6 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
     } catch (err) {
       const message = err instanceof Error ? err.message : "Something went wrong";
       captureAuthFailure({
-        projectSlug: "open-historia",
         provider: "google",
         stage: "signin",
         reason: message,

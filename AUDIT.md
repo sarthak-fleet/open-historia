@@ -9,8 +9,8 @@ No secrets found in git history. `.env*` is gitignored and `.env.local` was neve
 These are not committed but exist on disk -- rotate if machine is shared or compromised.
 
 ## Deployment
-`.vercel/` directory present -- project was deployed to Vercel at some point.
-No wrangler.toml, netlify.toml, or firebase.json found.
+Deployed on Cloudflare Workers via `wrangler.toml` and `@opennextjs/cloudflare`.
+Do not reintroduce stale deploy targets unless the production deploy path changes.
 
 ## Code Security
 - **Wide-open CORS**: `server/index.mjs:222` uses `app.use(cors())` with no origin restriction.
@@ -21,5 +21,5 @@ No wrangler.toml, netlify.toml, or firebase.json found.
 ## Action Items
 - [ ] Restrict CORS in `server/index.mjs` to specific origins instead of `cors()`
 - [ ] Rotate Turso auth token and Better Auth secret (exposed in local `.env.local`)
-- [ ] Verify Vercel deployment is deactivated if project is paused
+- [ ] Confirm old deployment targets are deactivated and Cloudflare Workers is the only active production deploy path
 - [ ] Add Google OAuth credentials to `.env.local` or confirm they were never provisioned

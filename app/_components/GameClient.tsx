@@ -352,7 +352,6 @@ export default function GameClient({ initialGameId }: { initialGameId?: string }
           <RelationsPanel
             relations={relations}
             playerNationName={gameState.players["player"].name}
-            provinces={gameState.provinces}
           />
         </div>
       )}

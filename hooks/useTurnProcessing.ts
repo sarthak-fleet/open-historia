@@ -146,7 +146,8 @@ export function useTurnProcessing(deps: {
         const turnEvents: string[] = [];
 
         if (data.updates) {
-          data.updates.forEach((update: Record<string, unknown>) => {
+          data.updates.forEach((rawUpdate) => {
+            const update = rawUpdate as Record<string, unknown>;
             if (update.type === "owner") {
               const provinceName = update.provinceName as string;
               const newOwner = update.newOwnerId as string;
