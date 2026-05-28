@@ -11,6 +11,7 @@
     "validate:env:deploy": "node scripts/validate-env.mjs deploy",
     "deploy": "pnpm validate:env:deploy && pnpm cf:build && wrangler deploy",
     "lint": "eslint",
+    "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
@@ -27,7 +28,6 @@
     "@libsql/client": "^0.17.3",
     "@saas-maker/changelog-widget": "^0.2.1",
     "@saas-maker/feedback": "^0.2.1",
-    "@saas-maker/posthog-client": "^0.1.0",
     "@saas-maker/sdk": "^0.3.1",
     "@saas-maker/testimonials": "^0.2.1",
     "@types/d3-geo": "^3.1.0",
@@ -42,7 +42,8 @@
     "react-dom": "19.2.5",
     "react-map-gl": "^8.1.1",
     "topojson-client": "^3.1.0",
-    "world-atlas": "^2.0.2"
+    "world-atlas": "^2.0.2",
+    "posthog-js": "^1.372.1"
   },
   "devDependencies": {
     "@opennextjs/cloudflare": "^1.19.4",
