@@ -131,7 +131,7 @@ export function sanitizeAiPayload(
       if (u.type === "time") {
         const rawAmount =
           typeof u.amount === "number" ? u.amount : Number(u.amount);
-        if (Number.isFinite(rawAmount)) {
+        if (Number.isFinite(rawAmount) && rawAmount >= 0) {
           updates.push({ type: "time", amount: Math.trunc(rawAmount) });
         }
       }
@@ -156,6 +156,7 @@ export function sanitizeAiPayload(
         u.nationA.trim() &&
         typeof u.nationB === "string" &&
         u.nationB.trim() &&
+        u.nationA.trim() !== u.nationB.trim() &&
         typeof u.relationType === "string" &&
         u.relationType.trim()
       ) {
