@@ -161,7 +161,7 @@ graph TB
 ### Installation
 
 ```bash
-git clone https://github.com/sarthakagrawal927/open-historia.git
+git clone https://github.com/sarthak-fleet/open-historia.git
 cd open-historia
 pnpm install
 ```
@@ -315,9 +315,9 @@ MIT License - see LICENSE file for details
 
 ## Links
 
-- **Repository**: [github.com/sarthakagrawal927/open-historia](https://github.com/sarthakagrawal927/open-historia)
+- **Repository**: [github.com/sarthak-fleet/open-historia](https://github.com/sarthak-fleet/open-historia)
 - **AI Developer Docs**: See AGENTS.md
-- **Issues**: [GitHub Issues](https://github.com/sarthakagrawal927/open-historia/issues)
+- **Issues**: [GitHub Issues](https://github.com/sarthak-fleet/open-historia/issues)
 
 ---
 
