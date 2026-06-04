@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Emit .next/standalone so Beasties' post-build inline-critical-css.mjs
+  // can modify the same HTML that OpenNext's --skipNextBuild consumes.
+  output: "standalone",
   // React Compiler conflicts with webpack mode (required for Cloudflare Workers build)
   reactCompiler: false,
   images: { unoptimized: true },
