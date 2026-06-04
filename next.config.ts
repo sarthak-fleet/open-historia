@@ -22,6 +22,23 @@ const nextConfig: NextConfig = {
         },
       ],
     },
+    {
+      // CF Edge wouldn't cache `/` with revalidate alone (s-maxage only)
+      // — adding max-age and CDN-Cache-Control via the route config makes
+      // OpenNext emit them, which is what CF actually honors for HTML.
+      source: "/",
+      headers: [
+        {
+          key: "Cache-Control",
+          value:
+            "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800",
+        },
+        {
+          key: "CDN-Cache-Control",
+          value: "public, s-maxage=86400, stale-while-revalidate=604800",
+        },
+      ],
+    },
   ],
 };
 
