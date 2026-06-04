@@ -16,6 +16,9 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  // Mono is used only inside the command terminal below the fold.
+  // Skipping preload keeps the LCP path (Playfair + Geist sans) clean.
+  preload: false,
 });
 
 const playfair = Playfair_Display({
