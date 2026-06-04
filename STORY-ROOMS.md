@@ -1,9 +1,10 @@
 # Story Rooms — Product Brief (v0)
 
-**Task**: 077dac23-07d4-4eee-8fc8-6a6ca0e41937 (Foundry Symphony)  
+**Task**: 14ad2fa6-5c7d-40d4-b292-127dd29f33b9 (Symphony — branch archive + AI co-author)  
+**Prior**: 077dac23-07d4-4eee-8fc8-6a6ca0e41937 (v0 voted story room)  
 **Source**: saas-ideas consolidation (aba1a83) + StoryTunes note, consolidated into "Social Creative Worlds" cluster.  
 **Home for prototype**: open-historia (this file + `/story-room` route).  
-**Status**: v0 local prototype complete. See "Placement note" below.
+**Status**: v0.1 local prototype — branch archive (replay/revive) + fixture AI co-author suggestions. See "Placement note" below.
 
 ---
 
@@ -38,11 +39,11 @@ It deliberately overlaps Open Historia's existing solo strengths (alternate-hist
 4. **Canon winner**  
    Highest votes wins. Its text is appended to the growing "canon so far." A short crowd-verdict flavor line comments on margin (unanimous roar / narrow / split hall).
 
-5. **Rejected branch preservation**  
-   All other submissions go into an "Apocrypha" / "Divergent Scrolls" section. They are not deleted or hidden. In a fuller version they could seed new rooms or solo branches.
+5. **Rejected branch preservation (archive)**  
+   All other submissions go into "Apocrypha" for the round, then into a persistent **Divergent Scrolls / branch archive** for the session. They are not deleted. **Replay** expands a what-if read; **Revive** pre-fills the player's next offering from that branch.
 
-6. **Optional AI persona**  
-   Toggle "Include AI co-author." When on, one participant slot is an AI persona (e.g. "Grok • Speculative Engine", "Clio the Unreliable Narrator") that contributes a proposal drawn from a bank of flavorful, outsider takes. In v0: pure client mock (no network, no tokens).
+6. **Optional AI persona (fixture co-author)**  
+   Toggle "Include AI co-author" for simulated rounds. Choose a persona placeholder (Grok • Speculative Engine, Clio the Unreliable Narrator). **Suggest a branch** picks one telling from fixture banks weighted by canon context — no network, no tokens. Player can adopt, submit as-is, or dismiss.
 
 After canonization the room immediately offers "Begin the next round on this canon" (the record grows) or "Forge an entirely new legend."
 
@@ -60,12 +61,12 @@ If it starts feeling like "Google Docs with history cosplay," we have failed the
 
 ---
 
-## v0 Scope (this task — deliberately smallest)
+## v0.1 Scope (this task — deliberately smallest)
 
 - One static product brief (this file).
-- One fully playable **local-only** prototype at `/story-room` that lets a single tester walk through a complete submit → vote → canon round (repeatable, multiple prompt seeds).
+- One fully playable **local-only** prototype at `/story-room`: submit → vote → canon, multi-round canon growth, **branch archive with replay/revive**, fixture **AI co-author suggestions** (`lib/story-room-fixtures.ts`).
 - Zero impact on core strategy saves: no DB writes, no `provinceOwners`, no `useGameState`, no Timeline snapshots, no api/turn, no cloud saves.
-- Pure client state + hardcoded banks for sim + AI.
+- Pure client state + fixture banks for sim + AI (no paid APIs).
 - Visual timer display + manual phase-advance buttons (demo speed > realism).
 - Consistent Open Historia dark/amber/emerald/rose/monospace aesthetic.
 - Heavy "PROTOTYPE — local only — StoryTunes fit test" banners.
@@ -110,7 +111,8 @@ Record this note in the saas-maker task row and any future plans.
 - saas-maker/docs/ideas/saas-ideas-consolidation-2026-06-03.md (StoryTunes row + Social Creative Worlds)
 - This repo's AGENTS.md, CLAUDE.md, existing StoryPath + Timeline code
 - `/story-room` (the v0 prototype itself)
-- Task 077dac23-07d4-4eee-8fc8-6a6ca0e41937 in Symphony
+- Task 14ad2fa6-5c7d-40d4-b292-127dd29f33b9 in Symphony (branch archive + AI co-author)
+- Task 077dac23-07d4-4eee-8fc8-6a6ca0e41937 (prior v0 story room)
 
 **Do not turn this into a generic editor. Keep the ritual.**
 

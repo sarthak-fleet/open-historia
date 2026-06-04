@@ -5,7 +5,7 @@ import StoryRoomPrototype from "@/components/StoryRoomPrototype";
 export const metadata: Metadata = {
   title: "Story Room Prototype — StoryTunes Fit Test",
   description:
-    "Local prototype for voted collaborative canon and AI co-authors. One round of submit / vote / canon with preserved apocryphal branches. Part of the StoryTunes evaluation for Open Historia.",
+    "Local prototype for voted collaborative canon, branch archive (replay/revive), and fixture AI co-author suggestions. StoryTunes evaluation for Open Historia.",
   robots: { index: false, follow: false },
 };
 
@@ -29,7 +29,7 @@ export default function StoryRoomPage() {
         {/* After the prototype: direct links to the brief and task context */}
         <div className="mt-8 border-t border-slate-800 pt-6 text-[11px] text-slate-500 max-w-prose">
           <p>
-            This is the smallest local prototype for the StoryTunes task. It demonstrates exactly one round of the submit/vote/canon loop + rejected branch preservation without touching any strategy-game state or saves.
+            StoryTunes prototype: submit/vote/canon, multi-round canon, branch archive with replay and revive, and fixture-only AI co-author suggestions — isolated from strategy-game state and saves.
           </p>
           <p className="mt-2">
             Read the full product brief: <span className="text-amber-400">STORY-ROOMS.md</span> (open the file in the repo root).

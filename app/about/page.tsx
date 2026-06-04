@@ -148,7 +148,7 @@ export default function AboutPage() {
           Experiments &amp; prototypes
         </h2>
         <p className="mt-2 text-sm leading-7 text-slate-300">
-          <Link href="/story-room" className="text-amber-400 underline decoration-dotted">Story Room prototype</Link> — a local-only demo of voted collaborative canon and AI co-authors (StoryTunes). One round of submit/vote/canon with preserved rejected branches. Completely isolated from core saves. See <code className="text-[10px]">STORY-ROOMS.md</code> in the repo for the brief and placement note.
+          <Link href="/story-room" className="text-amber-400 underline decoration-dotted">Story Room prototype</Link> — voted collaborative canon, branch archive (replay/revive), and fixture AI co-author suggestions (StoryTunes). Isolated from core saves. See <code className="text-[10px]">STORY-ROOMS.md</code> for the brief and placement note.
         </p>
 
         <h2 className="mt-8 text-xl font-semibold text-amber-500">
