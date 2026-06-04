@@ -257,6 +257,12 @@ USSR Survives (1995), Byzantine Revival (1204), Climate Collapse (2040)
 ### Fictional
 Zombie Apocalypse (2026), AI Awakening (2030), Mars Colonization (2035)
 
+### Story Room Prototype (v0)
+Playful local demo of voted collaborative canon + AI co-authors (StoryTunes fit test). One round of submit / vote / canon with preserved apocryphal branches. Completely isolated from core strategy saves.
+
+Try it: open `/story-room` (or `http://localhost:3000/story-room` while running).  
+Full brief and placement note: `STORY-ROOMS.md` in the repo root.
+
 ---
 
 ## Development
