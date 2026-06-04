@@ -1,0 +1,43 @@
+---
+// Features — pulled from AGENTS.md "Purpose" + "Stack".
+//
+// Three columns. Each is a short headline + one-sentence supporting
+// line. Kept terse on purpose — landing copy, not feature docs.
+const FEATURES = [
+  {
+    n: 'I',
+    t: 'Multi-provider AI',
+    b: 'Anthropic, OpenAI, Gemini, DeepSeek, or local. Bring your own key, pick your model per session.',
+    accent: 'amber',
+  },
+  {
+    n: 'II',
+    t: 'Save & share',
+    b: 'Turso-backed cloud saves. Resume anywhere, share a campaign URL, fork a friend’s timeline.',
+    accent: 'emerald',
+  },
+  {
+    n: 'III',
+    t: 'Alternate history',
+    b: 'Rewind to any turn. Branch off. The Game Master rolls the world forward from your new decision.',
+    accent: 'rose',
+  },
+] as const;
+---
+
+<section class="oh-features">
+  <div class="oh-eyebrow center">&middot;&nbsp; FEATURES &nbsp;&middot;</div>
+  <h2 class="oh-h2 center">
+    Three primitives. <em>Endless campaigns.</em>
+  </h2>
+  <div class="oh-features-grid">
+    {FEATURES.map((f) => (
+      <article class={`oh-feature oh-feature-${f.accent}`}>
+        <div class="oh-feature-num">{f.n}</div>
+        <div class="oh-feature-rule" aria-hidden="true"></div>
+        <h3 class="oh-feature-title">{f.t}</h3>
+        <p class="oh-feature-body">{f.b}</p>
+      </article>
+    ))}
+  </div>
+</section>

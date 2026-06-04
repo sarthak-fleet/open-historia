@@ -1,0 +1,49 @@
+---
+// Hero — LCP surface.
+//
+// The H1 ("OPEN HISTORIA") is the LCP element. Rendered in Playfair
+// Display 900 with wide letter-spacing to echo the in-game OG image
+// (app/opengraph-image.tsx → `letterSpacing: 8`).
+//
+// Single CTA points at /play. The Worker currently owns / and renders
+// the game there — see README cutover notes. The /play move has to
+// happen before Pages can take / for this landing.
+---
+
+<section class="oh-hero">
+  <div class="oh-hero-frame" aria-hidden="true"></div>
+
+  <div class="oh-eyebrow">
+    <span class="oh-eyebrow-dot" aria-hidden="true"></span>
+    AI grand strategy &mdash; in your browser
+  </div>
+
+  <h1 class="oh-hero-h1">
+    Open <em>Historia</em>
+  </h1>
+
+  <div class="oh-hero-divider" aria-hidden="true"></div>
+
+  <p class="oh-hero-tagline">
+    AI Grand Strategy Game
+  </p>
+
+  <p class="oh-hero-sub">
+    Command nations across all of human history with an AI Game Master.
+    Issue natural language commands. Forge alliances. Wage wars.
+    <em>Rewrite history.</em>
+  </p>
+
+  <div class="oh-hero-actions">
+    <a href="/play" class="oh-btn-primary">
+      Start a game <span aria-hidden="true">&rarr;</span>
+    </a>
+    <a href="https://github.com/sarthakagrawal927/open-historia" class="oh-btn-ghost" rel="noopener">
+      Open source <span aria-hidden="true">&#8599;</span>
+    </a>
+  </div>
+
+  <p class="oh-hero-fine">
+    Free &middot; open source &middot; bring your own AI key or use the free tier.
+  </p>
+</section>
