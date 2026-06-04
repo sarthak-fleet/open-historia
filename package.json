@@ -5,9 +5,9 @@
   "private": true,
   "scripts": {
     "dev": "cd server && npm install --silent && node index.mjs & next dev",
-    "build": "next build --webpack && node scripts/inline-critical-css.mjs",
+    "build": "next build --webpack",
     "start": "next start",
-    "cf:build": "opennextjs-cloudflare build",
+    "cf:build": "next build --webpack && node scripts/inline-critical-css.mjs && opennextjs-cloudflare build",
     "validate:env:deploy": "node scripts/validate-env.mjs deploy",
     "deploy": "pnpm validate:env:deploy && pnpm cf:build && wrangler deploy",
     "lint": "eslint",
