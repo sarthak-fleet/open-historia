@@ -1,4 +1,13 @@
 ---
+// Self-hosted variable fonts. Astro inlines the @font-face into the
+// page's CSS via Lightning CSS (build.inlineStylesheets: 'always'),
+// so we drop the external fonts.googleapis.com round-trip from the
+// LCP path. Families register as 'Playfair Display Variable' and
+// 'Geist Variable' — mapped onto the existing --font-* CSS vars below
+// so landing.css needs no changes. Geist Mono stays fallback-only
+// (matches the original Next.js layout — never preloaded here).
+import '@fontsource-variable/playfair-display';
+import '@fontsource-variable/geist';
 import '@/styles/landing.css';
 
 interface Props {
@@ -46,45 +55,15 @@ const OG_IMAGE = `${SITE_URL}/opengraph-image`;
       content="grand strategy, AI game, strategy game, historical simulation, open source, EU4, Paradox, geopolitics, war game, diplomacy"
     />
 
-    {/* ── Fonts ────────────────────────────────────────────────────
-       Playfair Display 700 carries the hero H1 (LCP element) and the
-       brand wordmark. Geist Sans is the body face. Both load via the
-       async preload pattern: preload, then swap media print → all on
-       load so the stylesheet never blocks first paint. The plain
-       <link rel="stylesheet"> inside <noscript> is the no-JS fallback.
-
-       Geist Mono is referenced by .oh-eyebrow / .oh-mono accents but
-       intentionally NOT preloaded — it isn't on the LCP path. The
-       weight + subset cost wasn't worth the marginal terminal flavor
-       on first paint; mono falls through to the CSS-stack fallback
-       until Google Fonts catches up post-paint. */}
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
-    <link
-      rel="preload"
-      as="style"
-      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Geist:wght@300;400;500;600;700&display=swap"
-    />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Geist:wght@300;400;500;600;700&display=swap"
-      media="print"
-      onload="this.media='all'"
-    />
-    <noscript>
-      <link
-        rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Geist:wght@300;400;500;600;700&display=swap"
-      />
-    </noscript>
-
     {/* Wire the same CSS vars the Next.js layout sets up via next/font,
-       so landing.css can reference them without changes. */}
+       so landing.css can reference them without changes. Fontsource
+       Variable registers families as '<Name> Variable'; plain names
+       stay in the fallback chain. Geist Mono is fallback-only —
+       matches the original Next.js layout (never preloaded here). */}
     <style is:inline>
       :root {
-        --font-playfair: 'Playfair Display', Georgia, 'Times New Roman', serif;
-        --font-geist-sans: 'Geist', system-ui, -apple-system, sans-serif;
+        --font-playfair: 'Playfair Display Variable', 'Playfair Display', Georgia, 'Times New Roman', serif;
+        --font-geist-sans: 'Geist Variable', 'Geist', system-ui, -apple-system, sans-serif;
         --font-geist-mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
       }
       html.dark { color-scheme: dark; }
