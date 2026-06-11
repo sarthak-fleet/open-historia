@@ -152,7 +152,7 @@ export function useGameState(initialGameId?: string) {
       }
 
       const initialPlayers = { ...INITIAL_PLAYERS };
-      const nation = provincesCache.find((p) => p.id === config.playerNationId);
+      const nation = provincesCache.find((p) => String(p.id) === String(config.playerNationId));
 
       let provinces = provincesCache;
       if (nation) {
