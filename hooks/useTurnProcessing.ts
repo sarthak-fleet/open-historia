@@ -296,7 +296,7 @@ export function useTurnProcessing(deps: {
         setProcessingTurn(false);
       }
     },
-    [gameState, gameConfig, processingTurn, logs, events, relations, storySoFar, addLog, setGameState, setRelations, setTimelineSnapshots]
+    [gameState, gameConfig, processingTurn, logs, events, relations, storySoFar, completedStepIds, addLog, setGameState, setRelations, setTimelineSnapshots]
   );
 
   const handleNextTurn = useCallback(() => {
