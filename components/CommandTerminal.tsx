@@ -21,20 +21,21 @@ const COMMAND_SUGGESTIONS = [
   "Wait / Advance Time by",
 ];
 
+function loadCommandHistory(): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const saved = localStorage.getItem("oh_command_history");
+    if (!saved) return [];
+    const parsed = JSON.parse(saved) as unknown;
+    return Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
 export default function CommandTerminal({ logs, onCommand, processing }: CommandTerminalProps) {
   const [input, setInput] = useState("");
-  const [commandHistory, setCommandHistory] = useState<string[]>(() => {
-    if (typeof window !== 'undefined') {
-        const saved = localStorage.getItem("oh_command_history");
-        try {
-            return saved ? JSON.parse(saved) : [];
-        } catch (e) {
-            console.error(e);
-            return [];
-        }
-    }
-    return [];
-  });
+  const [commandHistory, setCommandHistory] = useState<string[]>(() => loadCommandHistory());
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(0);
@@ -66,7 +67,11 @@ export default function CommandTerminal({ logs, onCommand, processing }: Command
     // Add to history
     const newHistory = [input, ...commandHistory.filter(cmd => cmd !== input)].slice(0, 50);
     setCommandHistory(newHistory);
-    localStorage.setItem("oh_command_history", JSON.stringify(newHistory));
+    try {
+      localStorage.setItem("oh_command_history", JSON.stringify(newHistory));
+    } catch {
+      // History is best-effort only; command submission should never fail here.
+    }
 
     onCommand(input);
     setInput("");
