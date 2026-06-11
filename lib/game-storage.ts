@@ -51,6 +51,7 @@ const isLegacyGameState = (state: PersistedGameState): state is GameState => {
 
 const SAVE_MIGRATIONS: Record<string, (save: SavedGame) => SavedGame> = {
   "2.0.0": (save) => ({ ...save, version: "3.0.0" }),
+  "3.0.0": (save) => ({ ...save, version: VERSION }),
 };
 
 function migrateSave(save: SavedGame): SavedGame {
