@@ -2,7 +2,7 @@
 
 import React, { useRef, useState } from "react";
 
-import { importSavedGame, type SavedGame } from "@/lib/game-storage";
+import { importSavedGame, loadGame, type SavedGame } from "@/lib/game-storage";
 
 interface SavedGamesListProps {
   savedGames: SavedGame[];
@@ -14,16 +14,21 @@ interface SavedGamesListProps {
   getNationName?: (id: string) => string;
 }
 
-function downloadSave(save: SavedGame, label: string): void {
+async function downloadSave(save: SavedGame, label: string): Promise<void> {
+  const fullSave =
+    "provinces" in save.gameState || "provinceOwners" in save.gameState
+      ? save
+      : (await loadGame(save.id)) || save;
+
   // Strip API key on the way out so users can share saves without
   // leaking credentials. game-storage.ts also persists keys, so we
   // can't trust the in-memory shape here.
-  const sanitizedConfig = { ...save.gameConfig, apiKey: "" };
+  const sanitizedConfig = { ...fullSave.gameConfig, apiKey: "" };
   const payload = {
     format: "open-historia-save",
     formatVersion: 1,
     exportedAt: new Date().toISOString(),
-    save: { ...save, gameConfig: sanitizedConfig },
+    save: { ...fullSave, gameConfig: sanitizedConfig },
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], {
     type: "application/json",
@@ -31,9 +36,9 @@ function downloadSave(save: SavedGame, label: string): void {
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
   anchor.href = url;
-  const turn = "turn" in save.gameState ? save.gameState.turn : "?";
+  const turn = "turn" in fullSave.gameState ? fullSave.gameState.turn : "?";
   const slug = label.replace(/\s+/g, "-").toLowerCase().replace(/[^a-z0-9-]/g, "");
-  anchor.download = `open-historia-${slug || save.id}-y${turn}.json`;
+  anchor.download = `open-historia-${slug || fullSave.id}-y${turn}.json`;
   anchor.click();
   URL.revokeObjectURL(url);
 }
@@ -152,11 +157,11 @@ export default function SavedGamesList({
                 </div>
               </div>
               <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-all">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    downloadSave(save, nation);
-                  }}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    void downloadSave(save, nation);
+                    }}
                   className="text-[11px] text-slate-500 hover:text-amber-300 px-2 py-1 rounded-lg hover:bg-slate-800/60"
                   title="Export this save as JSON"
                 >
