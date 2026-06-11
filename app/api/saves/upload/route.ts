@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import type { NextRequest} from "next/server";
 import { NextResponse } from "next/server";
@@ -64,6 +65,17 @@ export async function POST(req: NextRequest) {
     } catch { /* ignore */ }
 
     const now = Date.now();
+
+    const existing = await db
+      .select({ userId: savedGame.userId })
+      .from(savedGame)
+      .where(eq(savedGame.id, save.id))
+      .limit(1);
+
+    if (existing.length > 0 && existing[0].userId !== session.user.id) {
+      console.error(`Skipped upload for save ${save.id}: id belongs to another user`);
+      continue;
+    }
 
     const row = {
       id: save.id,

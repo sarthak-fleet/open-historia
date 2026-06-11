@@ -50,6 +50,20 @@ export function useTurnProcessing(deps: {
   const [storySoFar, setStorySoFar] = useState("");
   const [completedStepIds, setCompletedStepIds] = useState<string[]>([]);
 
+  function parseCustomYearDelta(input: string): number {
+    const trimmed = input.trim().toLowerCase();
+    if (!trimmed) return 0;
+    const match = trimmed.match(/(\d+(?:\.\d+)?)\s*(years?|y|months?|m|days?|d)\b/);
+    if (!match) return 0;
+    const amount = Number(match[1]);
+    if (!Number.isFinite(amount) || amount <= 0) return 0;
+
+    const unit = match[2][0];
+    if (unit === "y") return Math.trunc(amount);
+    if (unit === "m") return Math.trunc(amount / 12);
+    return 0;
+  }
+
   const addLog = useCallback((text: string, type: LogEntry["type"] = "info") => {
     setLogs((prev) => {
       const next = [...prev, { id: uid(), type, text }];
@@ -68,10 +82,13 @@ export function useTurnProcessing(deps: {
   );
 
   const processCommand = useCallback(
-    async (cmd: string) => {
+    async (cmd: string, turnOverride?: number) => {
       if (!gameState || !gameConfig || processingTurn) return;
 
       setProcessingTurn(true);
+      const turnYear = turnOverride ?? gameState.turn;
+      let nextEvents = [...events];
+      let nextRelations = [...relations];
 
       try {
         const provinceSummary = gameState.provinces
@@ -84,7 +101,7 @@ export function useTurnProcessing(deps: {
           body: JSON.stringify({
             command: cmd,
             gameState: {
-              turn: gameState.turn,
+              turn: turnYear,
               players: gameState.players,
               provinces: provinceSummary,
             },
@@ -198,14 +215,11 @@ export function useTurnProcessing(deps: {
               const eventType = (update.eventType as string) || "flavor";
               const newEvent: GameEvent = {
                 id: uid(),
-                year: (update.year as number) || gameState.turn,
+                year: (update.year as number) || turnYear,
                 description: update.description as string,
                 type: (eventType as GameEvent["type"]) || "flavor",
               };
-              setEvents((prev) => {
-                const next = [...prev, newEvent];
-                return next.length > MAX_EVENTS ? next.slice(-MAX_EVENTS) : next;
-              });
+              nextEvents = [...nextEvents, newEvent];
 
               const logType = (
                 eventType === "war" ? "war" :
@@ -228,16 +242,14 @@ export function useTurnProcessing(deps: {
                 type: (update.relationType as DiplomaticRelation["type"]) || "neutral",
                 treaties: [],
               };
-              setRelations((prev) => {
-                const filtered = prev.filter(
-                  (r) =>
-                    !(
-                      (r.nationA === rel.nationA && r.nationB === rel.nationB) ||
-                      (r.nationA === rel.nationB && r.nationB === rel.nationA)
-                    )
-                );
-                return [...filtered, rel];
-              });
+              nextRelations = nextRelations.filter(
+                (r) =>
+                  !(
+                    (r.nationA === rel.nationA && r.nationB === rel.nationB) ||
+                    (r.nationA === rel.nationB && r.nationB === rel.nationA)
+                  )
+              );
+              nextRelations = [...nextRelations, rel];
 
               hasSignificantEvent = true;
               const relType = update.relationType as string;
@@ -260,6 +272,9 @@ export function useTurnProcessing(deps: {
           });
         }
 
+        setEvents(nextEvents.length > MAX_EVENTS ? nextEvents.slice(-MAX_EVENTS) : nextEvents);
+        setRelations(nextRelations);
+
         if (turnEvents.length > 0) {
           const summary = turnEvents.map((e) => `  - ${e}`).join("\n");
           addLog(`--- Events This Period ---\n${summary}`, "event-summary");
@@ -271,17 +286,17 @@ export function useTurnProcessing(deps: {
               ...prev,
               {
                 id: uid(),
-                turnYear: gameState.turn,
+                turnYear,
                 timestamp: Date.now(),
                 description: turnEvents[0] || data.message?.slice(0, 100) || cmd.slice(0, 100),
                 command: cmd,
                 gameStateSlim: {
-                  turn: gameState.turn,
+                  turn: turnYear,
                   provinceOwners: Object.fromEntries(
                     gameState.provinces.map((p) => [String(p.id), p.ownerId])
                   ),
-                  events: events.slice(-20),
-                  relations,
+                  events: nextEvents.slice(-20),
+                  relations: nextRelations,
                 },
                 parentSnapshotId: prev.length > 0 ? prev[prev.length - 1].id : null,
               },
@@ -296,7 +311,7 @@ export function useTurnProcessing(deps: {
         setProcessingTurn(false);
       }
     },
-    [gameState, gameConfig, processingTurn, logs, events, relations, storySoFar, addLog, setGameState, setRelations, setTimelineSnapshots]
+    [gameState, gameConfig, processingTurn, logs, events, relations, storySoFar, completedStepIds, addLog, setGameState, setRelations, setTimelineSnapshots]
   );
 
   const handleNextTurn = useCallback(() => {
@@ -316,15 +331,17 @@ export function useTurnProcessing(deps: {
     }
 
     const yearDelta =
-      period === "5d" ? 0 :
-      period === "1m" ? 0 :
-      period === "6m" ? 0 :
-      period === "1y" ? 1 : 0;
+      timeStep === "custom"
+        ? parseCustomYearDelta(customTime)
+        : period === "1y"
+          ? 1
+          : 0;
+    const nextTurn = gameState.turn + yearDelta;
     if (yearDelta > 0) {
-      setGameState((prev) => (prev ? { ...prev, turn: prev.turn + yearDelta } : null));
+      setGameState((prev) => (prev ? { ...prev, turn: nextTurn } : null));
     }
     setPendingOrders([]);
-    processCommand(fullCommand);
+    processCommand(fullCommand, nextTurn);
   }, [gameState, gameConfig, processingTurn, timeStep, customTime, pendingOrders, processCommand, setGameState]);
 
   return {

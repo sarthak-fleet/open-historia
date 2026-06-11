@@ -151,8 +151,10 @@ export function useGameState(initialGameId?: string) {
         theme = "blueprint";
       }
 
-      const initialPlayers = { ...INITIAL_PLAYERS };
-      const nation = provincesCache.find((p) => p.id === config.playerNationId);
+      const initialPlayers = Object.fromEntries(
+        Object.entries(INITIAL_PLAYERS).map(([key, player]) => [key, { ...player }])
+      ) as typeof INITIAL_PLAYERS;
+      const nation = provincesCache.find((p) => String(p.id) === String(config.playerNationId));
 
       let provinces = provincesCache;
       if (nation) {
@@ -162,7 +164,6 @@ export function useGameState(initialGameId?: string) {
           const pParent = p.parentCountryId || String(p.id);
           return pParent === parentId ? { ...p, ownerId: "player" } : p;
         });
-        setProvincesCache(provinces);
       }
 
       const newState: GameState = {
@@ -218,7 +219,6 @@ export function useGameState(initialGameId?: string) {
         setSelectedPreset(getPresetById(saved.gameConfig.presetId) || null);
       }
       setGameState(restoredState);
-      setProvincesCache(restoredState.provinces);
       setShowPresets(false);
       window.history.replaceState(null, "", `/${saveId}`);
 

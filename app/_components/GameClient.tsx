@@ -150,6 +150,10 @@ export default function GameClient({ initialGameId }: { initialGameId?: string }
         turn.addLog(`Save "${saveId}" not found.`, "error");
         return;
       }
+      diplomacy.setChatThreads([]);
+      advisor.setAdvisorMessages([]);
+      timeline.setTimelineSnapshots([]);
+      setRelations([]);
       turn.setEvents(result.events);
       turn.setStorySoFar(result.storySoFar);
       turn.setCompletedStepIds(result.completedStepIds);
@@ -159,7 +163,7 @@ export default function GameClient({ initialGameId }: { initialGameId?: string }
       ]);
       save.onLoadComplete(saveId);
     },
-    [game, turn, save]
+    [game, turn, save, diplomacy, advisor, timeline]
   );
 
   // ── Save & Exit (reset all subsystems) ──
