@@ -22,19 +22,27 @@ const COMMAND_SUGGESTIONS = [
 ];
 
 export default function CommandTerminal({ logs, onCommand, processing }: CommandTerminalProps) {
-  const [input, setInput] = useState("");
-  const [commandHistory, setCommandHistory] = useState<string[]>(() => {
-    if (typeof window !== 'undefined') {
-        const saved = localStorage.getItem("oh_command_history");
-        try {
-            return saved ? JSON.parse(saved) : [];
-        } catch (e) {
-            console.error(e);
-            return [];
-        }
+  const readCommandHistory = (): string[] => {
+    if (typeof window === "undefined") return [];
+    try {
+      const saved = window.localStorage.getItem("oh_command_history");
+      return saved ? JSON.parse(saved) : [];
+    } catch (error) {
+      console.error(error);
+      return [];
     }
-    return [];
-  });
+  };
+
+  const writeCommandHistory = (history: string[]): void => {
+    try {
+      window.localStorage.setItem("oh_command_history", JSON.stringify(history));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const [input, setInput] = useState("");
+  const [commandHistory, setCommandHistory] = useState<string[]>(readCommandHistory);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(0);
@@ -66,7 +74,7 @@ export default function CommandTerminal({ logs, onCommand, processing }: Command
     // Add to history
     const newHistory = [input, ...commandHistory.filter(cmd => cmd !== input)].slice(0, 50);
     setCommandHistory(newHistory);
-    localStorage.setItem("oh_command_history", JSON.stringify(newHistory));
+    writeCommandHistory(newHistory);
 
     onCommand(input);
     setInput("");
