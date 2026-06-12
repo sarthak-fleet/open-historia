@@ -68,7 +68,7 @@ export function useTurnProcessing(deps: {
   );
 
   const processCommand = useCallback(
-    async (cmd: string) => {
+    async (cmd: string, advanceYear: number = 0) => {
       if (!gameState || !gameConfig || processingTurn) return;
 
       setProcessingTurn(true);
@@ -135,6 +135,10 @@ export function useTurnProcessing(deps: {
 
         if (data.storySoFar) {
           setStorySoFar(data.storySoFar);
+        }
+
+        if (advanceYear > 0) {
+          setGameState((prev) => (prev ? { ...prev, turn: prev.turn + advanceYear } : null));
         }
 
         // Owner-facing analytics — the Game Master successfully processed a
@@ -320,12 +324,9 @@ export function useTurnProcessing(deps: {
       period === "1m" ? 0 :
       period === "6m" ? 0 :
       period === "1y" ? 1 : 0;
-    if (yearDelta > 0) {
-      setGameState((prev) => (prev ? { ...prev, turn: prev.turn + yearDelta } : null));
-    }
     setPendingOrders([]);
-    processCommand(fullCommand);
-  }, [gameState, gameConfig, processingTurn, timeStep, customTime, pendingOrders, processCommand, setGameState]);
+    processCommand(fullCommand, yearDelta);
+  }, [gameState, gameConfig, processingTurn, timeStep, customTime, pendingOrders, processCommand]);
 
   return {
     processingTurn,
