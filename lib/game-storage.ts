@@ -50,16 +50,16 @@ const isLegacyGameState = (state: PersistedGameState): state is GameState => {
 };
 
 const SAVE_MIGRATIONS: Record<string, (save: SavedGame) => SavedGame> = {
-  "2.0.0": (save) => ({ ...save, version: "3.0.0" }),
+  "2.0.0": (save) => ({ ...save, version: VERSION }),
+  "3.0.0": (save) => ({ ...save, version: VERSION }),
 };
 
 function migrateSave(save: SavedGame): SavedGame {
   let current = save;
-  const versions = Object.keys(SAVE_MIGRATIONS);
-  let idx = versions.indexOf(current.version);
-  while (idx !== -1 && current.version !== VERSION) {
-    current = SAVE_MIGRATIONS[current.version](current);
-    idx = versions.indexOf(current.version);
+  while (current.version !== VERSION) {
+    const migrate = SAVE_MIGRATIONS[current.version];
+    if (!migrate) break;
+    current = migrate(current);
   }
   return current;
 }

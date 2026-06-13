@@ -94,6 +94,16 @@ export async function POST(req: NextRequest) {
 
   const now = Date.now();
 
+  const existing = await db
+    .select({ userId: savedGame.userId })
+    .from(savedGame)
+    .where(eq(savedGame.id, id))
+    .limit(1);
+
+  if (existing.length > 0 && existing[0].userId !== session.user.id) {
+    return NextResponse.json({ error: "Save id already belongs to another account" }, { status: 409 });
+  }
+
   const row = {
     id,
     userId: session.user.id,

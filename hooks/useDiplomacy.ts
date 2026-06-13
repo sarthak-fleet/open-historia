@@ -115,6 +115,10 @@ export function useDiplomacy(deps: {
           }),
         });
 
+        if (!res.ok) {
+          throw new Error(`Diplomacy request failed (${res.status})`);
+        }
+
         const data = await res.json();
 
         const aiMsg: ChatMessage = {

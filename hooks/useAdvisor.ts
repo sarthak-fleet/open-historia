@@ -66,6 +66,10 @@ export function useAdvisor(deps: {
           }),
         });
 
+        if (!res.ok) {
+          throw new Error(`Advisor request failed (${res.status})`);
+        }
+
         const data = await res.json();
 
         const advisorMsg: AdvisorMessage = {
