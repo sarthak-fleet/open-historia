@@ -150,6 +150,7 @@ export default function GameClient({ initialGameId }: { initialGameId?: string }
         turn.addLog(`Save "${saveId}" not found.`, "error");
         return;
       }
+      turn.setPendingOrders([]);
       diplomacy.setChatThreads([]);
       advisor.setAdvisorMessages([]);
       timeline.setTimelineSnapshots([]);
