@@ -134,7 +134,7 @@ export function buildGameMasterPrompt(args: {
     ? `STORY SO FAR (compressed history of this entire game — this is your primary memory):\n${storySoFar}`
     : "STORY SO FAR: Game just started. No prior history.";
 
-  let guidedStoryBlock = "";
+  const guidedStoryBlock = "";
   // We'll pass the story path info if available. This requires passing it through the API call.
   // For now, I'll add a placeholder and update the call site.
 
