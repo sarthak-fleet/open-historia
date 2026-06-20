@@ -1,7 +1,19 @@
 {
-  "extends": "@saas-maker/tsconfig/node.json",
   "compilerOptions": {
-    "noPropertyAccessFromIndexSignature": false
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "resolveJsonModule": true,
+    "noEmit": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": false,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "isolatedModules": true
   },
   "include": ["vite.config.ts", "vitest.config.ts", "eslint.config.js"]
 }
