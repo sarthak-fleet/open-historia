@@ -1,0 +1,7 @@
+{
+  "extends": "@saas-maker/tsconfig/node.json",
+  "compilerOptions": {
+    "noPropertyAccessFromIndexSignature": false
+  },
+  "include": ["vite.config.ts", "vitest.config.ts", "eslint.config.js"]
+}

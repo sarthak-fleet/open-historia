@@ -1,12 +1,9 @@
-"use client";
-
-import dynamic from "next/dynamic";
-import React from "react";
+import React, { lazy, Suspense } from "react";
 
 import { INITIAL_PLAYERS } from "@/lib/map-generator";
 import type { Player, Province } from "@/lib/types";
 
-const MapView = dynamic(() => import("@/components/MapView"), { ssr: false });
+const MapView = lazy(() => import("@/components/MapView"));
 
 export type ScenarioValidationLevel = "pass" | "warn" | "fail";
 
@@ -207,13 +204,15 @@ export default function ScenarioEditor({
             </div>
           </div>
           <div className="relative h-72 overflow-hidden rounded-xl border border-gray-700/60 bg-slate-950">
-            <MapView
-              provinces={previewProvinces}
-              players={buildPreviewPlayers()}
-              onSelectProvince={(provinceId) => onPlayerNationChange(provinceId === null ? "" : String(provinceId))}
-              selectedProvinceId={playerNationId || null}
-              theme="blueprint"
-            />
+            <Suspense fallback={<div className="flex h-full items-center justify-center text-xs text-slate-500">Loading map…</div>}>
+              <MapView
+                provinces={previewProvinces}
+                players={buildPreviewPlayers()}
+                onSelectProvince={(provinceId) => onPlayerNationChange(provinceId === null ? "" : String(provinceId))}
+                selectedProvinceId={playerNationId || null}
+                theme="blueprint"
+              />
+            </Suspense>
           </div>
         </div>
       </div>

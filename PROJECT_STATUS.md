@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-06-04
+Last updated: 2026-06-20
 
 ## Current Scope
 
@@ -8,19 +8,18 @@ Open Historia is an AI-powered grand strategy game where players issue natural-l
 
 ## Done
 
-- The app is built on Next.js/React and deploys to Cloudflare Workers through OpenNext.
-- Turso/Drizzle persistence, better-auth Google login, AI provider integration, and local/cloud saves are documented.
-- Core game surfaces include an AI Game Master, MapLibre world map, diplomacy engine, order queue, timeline rewind, AI advisor, and scenario presets.
-- Story Rooms has a local-only v0.1 prototype at `/story-room` with submit, vote, canon growth, branch archive replay/revive, and fixture AI co-author suggestions.
-- Story Rooms is currently positioned as an Open Historia mode, not a separate generic editor.
-- Security audit notes and residual operational risks are documented in `AUDIT.md`.
+- **De-OpenNext migration complete:** Vite + React 19 SPA (`app.html`) + Hono worker (`src/worker.ts`) on Cloudflare Workers. Astro landing overlays `/`; game at `/play` and `/play/:id`.
+- Turso/Drizzle persistence, better-auth Google login, and LLM proxy routes (`/api/turn`, `/api/chat`, `/api/advisor`) live in the Hono worker.
+- Core game surfaces: AI Game Master, MapLibre world map, diplomacy engine, order queue, timeline rewind, AI advisor, scenario presets.
+- Story Rooms local-only v0.1 prototype at `/story-room`.
+- React Compiler re-enabled via Vite (`babel-plugin-react-compiler`).
 
 ## Planned Next
 
 1. Connect natural-language orders, map state, timeline state, and AI adjudication into a tighter end-to-end campaign loop.
-2. Decide whether Story Rooms graduates into the main game loop as collaborative historiography or remains a local experiment.
+2. Decide whether Story Rooms graduates into the main game loop or remains a local experiment.
 3. Improve diplomacy and nation behavior so turns produce inspectable, explainable consequences.
-4. Revisit audit residuals around CORS and old deployment targets before production expansion.
+4. Revisit audit residuals around CORS before production expansion.
 
 ## Deferred / Parked
 

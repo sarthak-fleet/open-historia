@@ -1,26 +1,21 @@
-import { type Client,createClient } from "@libsql/client/web";
+import { createClient } from "@libsql/client/web";
 import { drizzle } from "drizzle-orm/libsql";
 
 import * as schema from "./schema";
 
-let _client: Client | null = null;
+export type DbEnv = {
+  TURSO_DATABASE_URL: string;
+  TURSO_AUTH_TOKEN?: string;
+};
 
-function getClient(): Client {
-  if (!_client) {
-    const url = process.env.TURSO_DATABASE_URL!;
-    // Convert libsql:// → https:// for fetch-based HTTP client (Cloudflare Workers compatible)
-    const httpUrl = url.replace(/^libsql:\/\//, "https://");
-    _client = createClient({
-      url: httpUrl,
-      authToken: process.env.TURSO_AUTH_TOKEN,
-    });
-  }
-  return _client;
+export function createDb(env: DbEnv) {
+  const url = env.TURSO_DATABASE_URL;
+  const httpUrl = url.replace(/^libsql:\/\//, "https://");
+  const client = createClient({
+    url: httpUrl,
+    authToken: env.TURSO_AUTH_TOKEN,
+  });
+  return drizzle(client, { schema });
 }
 
-export const db = new Proxy({} as ReturnType<typeof drizzle<typeof schema>>, {
-  get(_target, prop, receiver) {
-    const instance = drizzle(getClient(), { schema });
-    return Reflect.get(instance, prop, receiver);
-  },
-});
+export type AppDb = ReturnType<typeof createDb>;

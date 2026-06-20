@@ -1,7 +1,7 @@
 // Open Historia -- AI Prompt Templates
 // All prompts return strict JSON for deterministic parsing.
 
-import type { PromptOverrides } from "@/components/PromptSettings";
+import type { PromptOverrides } from "./prompt-overrides";
 
 const DIFFICULTY_PROFILES: Record<string, string> = {
   Sandbox: `SANDBOX MODE — MAXIMUM PERMISSIVENESS: The player can do virtually ANYTHING. Accept all player actions as succeeding unless they are physically impossible (e.g. teleportation, magic in a non-magic setting). Do NOT reject, refuse, or fail player actions based on "realism" or "plausibility". Wars are won quickly. Diplomacy always works. The player's nation is exceptionally powerful and competent. Other nations are cooperative and easily persuaded. Treat this as a creative sandbox where the player is exploring "what if" scenarios. The only limit is basic internal consistency. Consequences should be mild and recoverable. NEVER say an action "fails" or is "rejected" — find a way to make it work narratively.`,

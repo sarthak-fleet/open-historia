@@ -1,4 +1,3 @@
-"use client";
 
 import React, { useEffect, useRef, useState } from "react";
 import type { StoryPath, StoryStep } from "@/lib/types";

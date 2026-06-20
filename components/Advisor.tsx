@@ -1,4 +1,3 @@
-"use client";
 
 import React, { useCallback,useEffect, useRef, useState } from "react";
 
@@ -414,7 +413,7 @@ export default function Advisor({
       )}
 
       {/* Inline keyframes */}
-      <style jsx>{`
+      <style>{`
         @keyframes advisorSlideIn {
           from {
             opacity: 0;

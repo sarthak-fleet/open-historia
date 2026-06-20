@@ -1,7 +1,7 @@
+import type { WorkerEnv } from "./lib/worker-env";
+
 declare global {
-  interface CloudflareEnv {
-    DB: D1Database;
-  }
+  interface CloudflareEnv extends WorkerEnv {}
 }
 
 export {};

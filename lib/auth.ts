@@ -1,35 +1,50 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 
-import { db } from "@/lib/db";
-import * as schema from "@/lib/db/schema";
+import { createDb, type DbEnv } from "./db";
+import * as schema from "./db/schema";
 
-const canUseLocalAuthSecret =
-  process.env.NODE_ENV !== "production" ||
-  process.env.npm_lifecycle_event === "build" ||
-  process.env.NEXT_PHASE === "phase-production-build";
+export type AuthEnv = DbEnv & {
+  BETTER_AUTH_SECRET?: string;
+  BETTER_AUTH_URL?: string;
+  BETTER_AUTH_BASE_URL?: string;
+  GOOGLE_CLIENT_ID?: string;
+  GOOGLE_CLIENT_SECRET?: string;
+  NODE_ENV?: string;
+};
 
-const authSecret =
-  process.env.BETTER_AUTH_SECRET?.trim() ||
-  (canUseLocalAuthSecret ? "open-historia-local-development-secret-32-chars" : undefined);
-const googleClientId = process.env.GOOGLE_CLIENT_ID?.trim();
-const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET?.trim();
+export function createAuth(env: AuthEnv) {
+  const canUseLocalAuthSecret =
+    env.NODE_ENV !== "production" ||
+    process.env.npm_lifecycle_event === "build";
 
-export const auth = betterAuth({
-  baseURL: process.env.BETTER_AUTH_URL || process.env.BETTER_AUTH_BASE_URL || "http://localhost:3000",
-  secret: authSecret,
-  database: drizzleAdapter(db, {
-    provider: "sqlite",
-    schema,
-  }),
-  socialProviders:
-    googleClientId && googleClientSecret
-      ? { google: { clientId: googleClientId, clientSecret: googleClientSecret } }
-      : {},
-  session: {
-    expiresIn: 60 * 60 * 24 * 30, // 30 days
-  },
-  rateLimit: {
-    enabled: false,
-  },
-});
+  const authSecret =
+    env.BETTER_AUTH_SECRET?.trim() ||
+    (canUseLocalAuthSecret ? "open-historia-local-development-secret-32-chars" : undefined);
+  const googleClientId = env.GOOGLE_CLIENT_ID?.trim();
+  const googleClientSecret = env.GOOGLE_CLIENT_SECRET?.trim();
+
+  const db = createDb(env);
+
+  return betterAuth({
+    baseURL:
+      env.BETTER_AUTH_URL ||
+      env.BETTER_AUTH_BASE_URL ||
+      "http://localhost:5173",
+    secret: authSecret,
+    database: drizzleAdapter(db, {
+      provider: "sqlite",
+      schema,
+    }),
+    socialProviders:
+      googleClientId && googleClientSecret
+        ? { google: { clientId: googleClientId, clientSecret: googleClientSecret } }
+        : {},
+    session: {
+      expiresIn: 60 * 60 * 24 * 30,
+    },
+    rateLimit: {
+      enabled: false,
+    },
+  });
+}
