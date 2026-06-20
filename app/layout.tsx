@@ -6,7 +6,6 @@ import { Playfair_Display } from "next/font/google";
 
 import { AnalyticsProvider } from "../components/posthog-provider";
 import { SaaSMakerFeedback } from "../components/saasmaker-feedback";
-import { SaasMakerAnalytics } from "../components/SaasMakerAnalytics";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -94,7 +93,6 @@ export default function RootLayout({
         <AnalyticsProvider>
           {children}
           <SaaSMakerFeedback />
-          <SaasMakerAnalytics />
         </AnalyticsProvider>
       </body>
     </html>
