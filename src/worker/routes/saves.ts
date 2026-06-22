@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
 import type { Context } from "hono";
 import { Hono } from "hono";
 
@@ -181,6 +181,27 @@ saves.post("/upload", async (c) => {
   let uploaded = 0;
   const db = createDb(c.env);
 
+  // Batch the per-save ownership lookups into a single query. `savedGame.id` is
+  // the primary key, so each id maps to at most one existing owner — equivalent
+  // to the previous per-save SELECT but collapsing N reads into one.
+  const candidateIds = Array.from(
+    new Set(
+      uploadSaves
+        .filter((s) => s.id && s.gameState && s.gameConfig)
+        .map((s) => s.id as string),
+    ),
+  );
+  const existingOwners = new Map<string, string>();
+  if (candidateIds.length > 0) {
+    const ownerRows = await db
+      .select({ id: savedGame.id, userId: savedGame.userId })
+      .from(savedGame)
+      .where(inArray(savedGame.id, candidateIds));
+    for (const ownerRow of ownerRows) {
+      existingOwners.set(ownerRow.id, ownerRow.userId);
+    }
+  }
+
   for (const save of uploadSaves) {
     if (!save.id || !save.gameState || !save.gameConfig) continue;
 
@@ -216,13 +237,8 @@ saves.post("/upload", async (c) => {
 
     const now = Date.now();
 
-    const existing = await db
-      .select({ userId: savedGame.userId })
-      .from(savedGame)
-      .where(eq(savedGame.id, save.id))
-      .limit(1);
-
-    if (existing.length > 0 && existing[0].userId !== session.user.id) {
+    const existingOwner = existingOwners.get(save.id);
+    if (existingOwner !== undefined && existingOwner !== session.user.id) {
       console.error(`Skipped upload for save ${save.id}: id belongs to another user`);
       continue;
     }
