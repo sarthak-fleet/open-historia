@@ -18,7 +18,7 @@ Last updated: 2026-06-20
 - **Map:** MapLibre GL JS + Natural Earth / world-atlas TopoJSON.
 - **DB:** Turso (libSQL) + Drizzle — cloud saves.
 - **Auth:** better-auth + Google OAuth (optional).
-- **AI:** free-ai-gateway chokepoint; Anthropic, OpenAI, Gemini, DeepSeek; `RATE_LIMITER` binding on AI routes.
+- **AI:** free-ai-gateway chokepoint; Anthropic, OpenAI, Gemini, DeepSeek; in-memory rate limiting on AI routes (`lib/rate-limit.ts`).
 - **Offline saves:** Browser localStorage works without auth. Cloud saves require Turso + Google OAuth env vars.
 - **Repository:** github.com/sarthak-fleet/open-historia.
 
@@ -62,13 +62,13 @@ Browser → Cloudflare Worker
   └─ ASSETS          Vite build + landing index.html + SPA fallback for /play/*
 ```
 
-**De-OpenNext migration complete:** Vite SPA + Hono worker replaces prior OpenNext stack. `PROJECT_STATUS.md` and `package.json` scripts supersede stale README architecture diagrams where they conflict.
+**De-OpenNext migration complete:** Vite SPA + Hono worker replaces prior OpenNext stack. README and `AGENTS.md` stack/deploy/structure sections were realigned to the Vite + Hono reality (2026-06-23); `package.json` scripts remain authoritative on commands.
 
 ## Timeline
 
 - **Stack migration:** De-OpenNext complete — Vite SPA + Hono worker is current production path.
 - **Story Rooms v0.1:** local prototype at `/story-room` — no shared database with core strategy saves.
-- **README drift:** architecture section still describes pre-migration OpenNext in places — this file and `package.json` are authoritative.
+- **README/AGENTS drift fixed (2026-06-23):** stack, deploy, and repo-structure sections now describe the Vite SPA + Hono worker stack.
 
 ## Products
 
@@ -112,7 +112,7 @@ Browser → Cloudflare Worker
 - React Compiler enabled.
 - Vitest + Playwright coverage; mobile e2e project.
 - Biome format/check in CI scripts.
-- Rate limiting on AI routes via Cloudflare `RATE_LIMITER` binding.
+- Rate limiting on AI routes via in-memory sliding-window limiter (`lib/rate-limit.ts`).
 
 ## Todo / Planned / Deferred / Blocked
 
@@ -122,7 +122,7 @@ Browser → Cloudflare Worker
 2. Decide whether Story Rooms graduates into main game or stays local experiment.
 3. Improve diplomacy and nation behavior — inspectable, explainable turn consequences.
 4. Revisit CORS audit residuals before production expansion.
-5. Align README architecture section with post-migration Vite+Hono stack (docs drift).
+5. Update `.github/workflows/deploy.yml` path filters — still reference removed `app/**`, `next.config.ts`, `open-next.config.ts`, `postcss.config.mjs`; should track `src/**` instead (changes CI trigger behavior, not docs).
 
 ### Deferred
 
@@ -133,8 +133,7 @@ Browser → Cloudflare Worker
 
 ### Blocked
 
-- README still describes pre-migration OpenNext architecture in places — this file and `package.json` are authoritative.
-- AI providers require internet; local dev bridge under `server/` for dev mode only.
+- AI providers require internet; local dev AI bridge (`lib/local-ai.ts`, `LOCAL_AI_URL`) for dev mode only.
 - API cost varies by provider ($0.10–$0.50/hr typical on GPT-4 class models) — user-supplied keys.
 - Deploy: push to `main` triggers GitHub Actions; PRs get preview workers.
 - Env validation: `pnpm validate:env:deploy` before production deploy.

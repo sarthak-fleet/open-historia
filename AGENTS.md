@@ -8,89 +8,115 @@ Also read and follow the shared fleet-level agent standard at `../AGENTS.md`. Tr
 AI grand-strategy history game — players issue natural language commands to control civilizations; LLM acts as game master returning strict JSON state updates.
 
 ## Stack
-- Framework: Next.js 16 (App Router, React 19, React Compiler ON)
+- Frontend: Vite 8 + React 19 SPA (`src/main.tsx` → `src/router.tsx`, react-router-dom). React Compiler ON via `babel-plugin-react-compiler`.
+- Worker/API: Hono on Cloudflare Workers — `src/worker.ts` mounts route modules under `src/worker/routes/*.ts`. Serves the SPA + Astro landing from the `ASSETS` binding.
 - Language: TypeScript (strict)
-- Styling: Tailwind CSS v4 (dark/monospace; amber = actions, emerald = success, rose = war)
+- Styling: Tailwind CSS v4 (`@tailwindcss/vite`; dark/monospace; amber = actions, emerald = success, rose = war)
 - Map: MapLibre GL JS (WebGL) via `react-map-gl/maplibre` — 3-tier hierarchical LOD
 - DB: Turso (libSQL) + Drizzle ORM
-- Auth: better-auth (Google OAuth + Drizzle adapter)
-- AI: Anthropic, OpenAI, Google Gemini, DeepSeek, local (multi-provider)
-- Testing: None configured
-- Deploy: Cloudflare Workers (`open-historia`) via @opennextjs/cloudflare
+- Auth: better-auth (Google OAuth, optional + Drizzle adapter)
+- AI: multi-provider, called server-side in `src/worker/routes/llm.ts` — Anthropic, OpenAI, Google Gemini, DeepSeek, free-ai-gateway, local dev bridge
+- Testing: Vitest unit (`lib/__tests__/`) + Playwright e2e (`e2e/`, desktop + mobile)
+- Deploy: Cloudflare Workers (`open-historia`) via `wrangler deploy` (NOT OpenNext — Next.js was removed in the Vite + Hono migration)
 - Package manager: pnpm
 
 ## Repo structure
 ```
-app/
-  page.tsx             # Main game orchestrator (~1,144 lines) — all core state
-  [id]/page.tsx        # Game session by ID
-  layout.tsx           # Root layout + better-auth session provider
-  api/
-    turn/route.ts      # Game Master: processes commands via AI → strict JSON updates
-    chat/route.ts      # Bilateral diplomacy AI chat
-    advisor/route.ts   # Strategic advisor AI
-    saves/             # Cloud save CRUD
-    auth/[...all]/     # better-auth dynamic handler
+src/
+  main.tsx              # SPA entry — mounts RouterProvider
+  router.tsx            # react-router routes: /play, /play/:id, /about, /privacy, /story-room
+  RootLayout.tsx        # Shared SPA layout (analytics/feedback providers)
+  worker.ts             # Hono fetch handler — routes /api/*, else serves ASSETS + SPA fallback
+  worker/
+    bind-env.ts         # Binds WorkerEnv onto module-level accessors per request
+    routes/
+      llm.ts            # POST /api/turn, /api/chat, /api/advisor — multi-provider LLM calls
+      saves.ts          # /api/saves CRUD + /api/saves/upload (Turso, Drizzle)
+  pages/                # Route components: GamePage, AboutPage, PrivacyPage, StoryRoomPage, NotFoundPage
+  styles/globals.css    # Tailwind v4 entry
 components/
-  MapView.tsx          # MapLibre GL JS renderer — 3-tier LOD, hit-testing (~1,150 lines)
-  CommandTerminal.tsx  # Terminal-style command input + history
-  DiplomacyChat.tsx    # Multi-threaded nation chat UI
-  Timeline.tsx         # Timeline with rewind + alternate history branching
-  Advisor.tsx          # Strategic advisor panel
-  GameSetup.tsx        # Scenario/nation/provider/difficulty config
-  PresetBrowser.tsx    # 20+ preset scenario gallery
-  SavedGamesList.tsx   # Cloud save browser
+  GameClient.tsx        # Main game orchestrator (mounted by GamePage)
+  MapView.tsx           # MapLibre GL JS renderer — 3-tier LOD, hit-testing (largest file)
+  MapShell.tsx          # Map container/chrome
+  CommandTerminal.tsx   # Terminal-style command input + history
+  DiplomacyChat.tsx     # Multi-threaded nation chat UI
+  Timeline.tsx          # Timeline with rewind + alternate history branching
+  Advisor.tsx           # Strategic advisor panel
+  GameSetup.tsx         # Scenario/nation/provider/difficulty config
+  PresetBrowser.tsx     # 20+ preset scenario gallery
+  SavedGamesList.tsx    # Cloud save browser
+  StoryRoomPrototype.tsx# Story Rooms v0.1 local prototype
+  AuthModal.tsx / UserMenu.tsx  # better-auth UI
 hooks/
-  useGameState.ts      # Central game state
-  useTurnProcessing.ts # POSTs command to /api/turn, handles JSON response
-  useTimeline.ts       # Timeline snapshots
+  useGameState.ts       # Central game state
+  useTurnProcessing.ts  # POSTs command to /api/turn, handles JSON response
+  useDiplomacy.ts       # /api/chat diplomacy flow
+  useAdvisor.ts         # /api/advisor flow
+  useSaveLoad.ts        # cloud/local save orchestration
+  useTimeline.ts        # Timeline snapshots
 lib/
-  ai-prompts.ts        # All LLM prompt templates (strict JSON contract)
-  types.ts             # Province, Player, GameState, GameEvent, ChatThread
-  world-loader.ts      # TopoJSON loading, province neighbor computation
-  presets.ts           # 20+ scenario presets (historical/modern/alternate/fictional)
-  auth.ts              # better-auth server config
-  auth-client.ts       # better-auth browser client
+  ai-prompts.ts         # All LLM prompt templates (strict JSON contract)
+  turn-parser.ts        # Parses/validates AI turn JSON
+  types.ts              # Province, Player, GameState, GameEvent, ChatThread
+  world-loader.ts       # TopoJSON loading, province neighbor computation
+  presets.ts            # 20+ scenario presets (historical/modern/alternate/fictional)
+  worker-env.ts         # WorkerEnv type (Cloudflare bindings + secrets)
+  auth.ts               # better-auth server config (createAuth)
+  auth-client.ts        # better-auth browser client
+  local-ai.ts           # Local dev AI bridge client
+  rate-limit.ts         # In-memory sliding-window rate limiter for AI routes
+  crypto.ts             # API key encryption helpers
   db/
-    schema.ts          # Drizzle schema (users, sessions, saves)
-    index.ts           # Turso libSQL client
-  rate-limit.ts        # IP-based rate limiting for AI routes
-  crypto.ts            # API key encryption helpers
-server/
-  index.mjs            # Express (port 3001) — local AI bridge, started by pnpm dev
+    schema.ts           # Drizzle schema: user/session/account/verification + saved_game
+    index.ts            # createDb() — Turso libSQL client (libsql/web)
+landing-astro/          # Astro marketing landing, overlaid at / by scripts/overlay-astro-landing.mjs
 public/
-  world-50m.json       # TopoJSON world (mid-res, primary)
-  world-110m.json      # TopoJSON world (low-res)
+  world-50m.json        # TopoJSON world (mid-res, primary)
+  world-110m.json       # TopoJSON world (low-res)
   provinces-combined.json
-  admin1-detail.json   # Admin1-level detail (lazy-loaded at zoom >= 5)
+  admin1-detail.json    # Admin1-level detail (lazy-loaded at zoom >= 5)
 scripts/
   build-provinces-map.mjs
+  overlay-astro-landing.mjs  # cf:build step — overlays Astro landing onto dist/
+  validate-env.mjs           # pre-deploy env validation
+app.html                # SPA shell (served for /play, /about, /privacy, /story-room)
+index.html              # landing entry (replaced by Astro overlay in cf:build)
+wrangler.toml           # main = src/worker.ts; assets dir = dist; nodejs_compat
 ```
 
 ## Key commands
 ```bash
-pnpm dev          # Express local-AI server (:3001) + Next.js concurrently
-pnpm build        # next build
-pnpm start        # next start
-pnpm lint         # eslint
+pnpm dev          # concurrently: `wrangler dev` (worker, :8787) + `vite` (FE, :5173)
+pnpm dev:worker   # wrangler dev only
+pnpm dev:fe       # vite only
+pnpm build        # vite build → dist/
+pnpm cf:build     # vite build + build landing-astro + overlay onto dist/
+pnpm deploy       # validate env → cf:build → wrangler deploy
+pnpm lint         # eslint (components lib src scripts)
+pnpm typecheck    # tsc on tsconfig.app.json + tsconfig.worker.json
+pnpm test         # vitest run
+pnpm test:e2e     # playwright (test:e2e:mobile for mobile project)
+pnpm format | pnpm check  # biome
 
 # Database
 pnpm db:generate  # drizzle-kit generate (migration files)
+pnpm db:migrate   # drizzle-kit migrate
 pnpm db:push      # drizzle-kit push (apply schema to Turso)
 pnpm db:studio    # drizzle-kit studio
 ```
 
 ## Architecture notes
+- **Vite SPA + Hono worker**: the browser loads a React SPA (`app.html`); `/api/*` requests hit the Hono worker (`src/worker.ts`). All AI calls and DB access happen server-side in the worker — provider API keys never run in the browser. SPA routes (`/play`, `/about`, `/privacy`, `/story-room`) fall back to `app.html`; `/` serves the Astro landing.
 - **React Compiler ON** — do NOT add manual `useMemo`/`useCallback`.
-- **AI as game engine**: AI returns strict JSON — `{ message, updates[], newEvents[], relationChanges[], updatedStorySoFar }`. Always validate AI JSON before applying. Contract defined in `lib/ai-prompts.ts`.
+- **AI as game engine**: AI returns strict JSON — `{ message, updates[], newEvents[], relationChanges[], updatedStorySoFar }`. Always validate AI JSON before applying (`lib/turn-parser.ts`). Contract defined in `lib/ai-prompts.ts`.
 - **`storySoFar` pattern**: each turn, AI compresses full history into a running summary to keep token count constant. Only last 8 logs + last 5 events sent as detailed context.
 - **Difficulty as AI personality**: `DIFFICULTY_PROFILES` change AI behavior instructions (not numeric stats).
 - **Map 3-tier LOD**: Countries (zoom 0–3.5) → Regions/provinces (2.5–6.5) → States/admin1 (5.5+). Admin1 lazy-loaded at zoom 5. Use `queryRenderedFeatures` for hit-testing. Import `MapGL` (not `Map`) from `react-map-gl/maplibre` — avoids shadowing `globalThis.Map`.
 - **Auth**: better-auth (not NextAuth). Client: `lib/auth-client.ts`. Server: `lib/auth.ts`. Google OAuth only.
 - **Save format**: only `provinceOwners` (id + ownerId) serialized — survives TopoJSON ID changes.
 - **Province name matching**: AI may return fuzzy names — `findProvince()` tries exact → suffix-stripped → parent country name.
-- **`page.tsx` (~1,144 lines) and `MapView.tsx` (~1,150 lines)** are large files — be careful with edits.
-- Env vars: `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`.
+- **`MapView.tsx` and `GameClient.tsx`** are the largest files — be careful with edits.
+- Worker env / secrets (`lib/worker-env.ts`, `.env.example`): `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `AI_GATEWAY_API_KEY` (legacy alias `FREE_AI_API_KEY`), `FREE_AI_GATEWAY_URL`, `LOCAL_AI_URL`. Vite-baked client vars use the `VITE_` prefix.
 
 <!-- FLEET-GUIDANCE:START -->
 

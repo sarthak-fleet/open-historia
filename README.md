@@ -10,13 +10,13 @@ Open Historia is a unique strategy game where you command nations using natural 
 
 | Concern | Service |
 |---------|---------|
-| Hosting | Cloudflare Workers (`open-historia`) via `@opennextjs/cloudflare` |
+| Hosting | Cloudflare Workers (`open-historia`) — Hono worker (`src/worker.ts`) serving a Vite/React SPA + Astro landing via the `ASSETS` binding |
 | Database | Turso (libSQL) via Drizzle ORM |
-| Auth | better-auth + Google OAuth |
-| AI | free-ai-gateway (Workers AI chokepoint); Anthropic, OpenAI & Google Gemini APIs supported |
-| CI/CD | GitHub Actions — auto-deploy to Cloudflare on push to `main` (PRs get preview workers) |
+| Auth | better-auth + Google OAuth (optional) |
+| AI | free-ai-gateway chokepoint; Anthropic, OpenAI, Google Gemini & DeepSeek APIs supported (server-side in `src/worker/routes/llm.ts`) |
+| CI/CD | GitHub Actions — `pnpm cf:build` + `wrangler deploy` on push to `main` (PRs get preview workers) |
 
-Rate limiting on AI routes uses a Cloudflare Workers `RATE_LIMITER` binding (see `wrangler.toml`).
+Rate limiting on AI routes is an in-memory sliding-window limiter (`lib/rate-limit.ts`).
 
 ---
 
@@ -61,7 +61,7 @@ Traditional grand strategy games require complex menu navigation, steep learning
 
 ```mermaid
 graph TB
-    subgraph "Frontend (Next.js 16 + React 19)"
+    subgraph "Frontend (Vite + React 19 SPA)"
         UI["UI Components"]
         Map["Interactive Map - MapLibre GL JS"]
         Game["Game State Manager"]
@@ -69,12 +69,12 @@ graph TB
         UI --> Game
     end
 
-    subgraph "API Layer (Next.js API Routes)"
-        Turn["api/turn - Execute Commands"]
-        Chat["api/chat - Diplomacy"]
-        Advisor["api/advisor - Strategic Advice"]
-        Auth["api/auth - Better Auth"]
-        Saves["api/saves - CRUD Operations"]
+    subgraph "API Layer (Hono Cloudflare Worker)"
+        Turn["POST /api/turn - Execute Commands"]
+        Chat["POST /api/chat - Diplomacy"]
+        Advisor["POST /api/advisor - Strategic Advice"]
+        Auth["/api/auth/* - Better Auth"]
+        Saves["/api/saves - CRUD + upload"]
     end
 
     subgraph "AI Providers"
@@ -139,19 +139,20 @@ graph TB
 
 ### Tech Stack
 
-- **Next.js 16** + React 19 + TypeScript
+- **Vite 8 + React 19 SPA** (react-router) + TypeScript; React Compiler on
+- **Hono on Cloudflare Workers** for the API + asset serving (`src/worker.ts`)
 - **MapLibre GL JS** for WebGL map rendering with hierarchical LOD (Natural Earth 50m data)
 - **Tailwind CSS 4** for dark-themed UI
 - **Turso + Drizzle** for cloud saves (optional)
 - **Better Auth** with Google OAuth (optional)
-- **Multi-AI Support**: Claude, GPT-4, Gemini, DeepSeek, or local development mode
+- **Multi-AI Support**: Claude, GPT-4, Gemini, DeepSeek, free-ai-gateway, or local development mode
 
 ### Key Components
 
-- **Frontend**: React components with MapLibre GL JS (WebGL) map visualization
-- **API Routes**: Next.js API routes handle AI provider calls, game logic, and data persistence
+- **Frontend**: React SPA components with MapLibre GL JS (WebGL) map visualization
+- **Worker API**: Hono routes (`src/worker/routes/*.ts`) handle AI provider calls and data persistence server-side
 - **Game Engine**: Client-side game state management with turn-based execution
-- **AI Integration**: Unified interface to multiple AI providers with prompt engineering
+- **AI Integration**: Unified server-side interface to multiple AI providers with prompt engineering
 - **Storage Layer**: Dual-mode saves (cloud via Turso or local browser storage)
 
 ---
@@ -172,11 +173,9 @@ pnpm install
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
-
-> Note: `pnpm dev` also starts a small local AI bridge under `server/`. The
-> current dev script installs that subfolder's dependencies via `npm install`
-> automatically.
+`pnpm dev` runs `wrangler dev` (the worker, on http://localhost:8787) and `vite`
+(the frontend dev server, on http://localhost:5173) concurrently. Open
+[http://localhost:8787](http://localhost:8787) to use the worker-served app.
 
 ### How to Play
 
@@ -196,7 +195,7 @@ TURSO_AUTH_TOKEN=your-token
 
 # Better Auth
 BETTER_AUTH_SECRET=random-32-char-secret
-BETTER_AUTH_URL=http://localhost:3000
+BETTER_AUTH_URL=http://localhost:8787
 
 # Google OAuth (cloud saves)
 GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
@@ -260,7 +259,7 @@ Zombie Apocalypse (2026), AI Awakening (2030), Mars Colonization (2035)
 ### Story Room Prototype (v0.1)
 Playful local demo of voted collaborative canon, branch archive (replay/revive), and fixture AI co-author suggestions (StoryTunes fit test). Completely isolated from core strategy saves.
 
-Try it: open `/story-room` (or `http://localhost:3000/story-room` while running).  
+Try it: open `/story-room` (or `http://localhost:8787/story-room` while running).  
 Full brief and placement note: `STORY-ROOMS.md` in the repo root.
 
 ---
@@ -270,10 +269,14 @@ Full brief and placement note: `STORY-ROOMS.md` in the repo root.
 ### Scripts
 
 ```bash
-npm run dev          # Dev server (includes local AI bridge)
-npm run build        # Production build
-npm run start        # Production server
-npm run lint         # ESLint
+pnpm dev          # wrangler dev (worker) + vite (frontend), concurrently
+pnpm build        # vite build → dist/
+pnpm cf:build     # vite build + Astro landing overlay (used by deploy)
+pnpm deploy       # validate env + cf:build + wrangler deploy
+pnpm lint         # ESLint
+pnpm typecheck    # tsc (app + worker tsconfigs)
+pnpm test         # Vitest unit tests
+pnpm test:e2e     # Playwright e2e
 ```
 
 ### For AI Agents
