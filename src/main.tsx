@@ -10,9 +10,12 @@ import "@fontsource-variable/playfair-display/index.css";
 
 import "@/src/styles/globals.css";
 import { router } from "./router";
+import { initVitals } from "./lib/vitals";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <RouterProvider router={router} />
   </StrictMode>,
 );
+
+initVitals();
