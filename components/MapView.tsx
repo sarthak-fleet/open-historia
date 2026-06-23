@@ -358,12 +358,18 @@ function buildRelationBorderGeoJSON(
   pairs: Set<string>
 ): FeatureCollection {
   if (pairs.size === 0) return { type: "FeatureCollection", features: [] };
+  // Build a Map keyed by province id once, so each neighbor lookup is O(1)
+  // instead of an O(n) linear scan per neighbor per province.
+  const provinceById = new globalThis.Map<string, Province>();
+  for (const p of provinces) {
+    provinceById.set(String(p.id), p);
+  }
   const features: Feature[] = [];
   for (const p of provinces) {
     if (!p.ownerId) continue;
     let hasBorder = false;
     for (const nId of p.neighbors) {
-      const neighbor = provinces.find((np) => np.id === nId);
+      const neighbor = provinceById.get(String(nId));
       if (
         neighbor?.ownerId &&
         neighbor.ownerId !== p.ownerId &&
@@ -487,6 +493,16 @@ export default function MapView({
 
   const citiesGeoJSON = useMemo(() => buildCitiesGeoJSON(), []);
 
+  // O(1) province lookup by id — replaces repeated O(n) .find() scans in
+  // click/hover handlers and the pan-to-selected effect.
+  const provinceById = useMemo(() => {
+    const m = new globalThis.Map<string, Province>();
+    for (const p of provinces) {
+      m.set(String(p.id), p);
+    }
+    return m;
+  }, [provinces]);
+
   // Ocean / sea labels — purely cosmetic, anchored to fixed centroids so
   // the empty blue space reads as an atlas instead of dead pixels.
   const oceansGeoJSON = useMemo<FeatureCollection>(
@@ -533,7 +549,7 @@ export default function MapView({
   const selectedGeoJSON = useMemo<FeatureCollection>(() => {
     if (selectedProvinceId === null)
       return { type: "FeatureCollection", features: [] };
-    const selected = provinces.find((pr) => pr.id === selectedProvinceId);
+    const selected = provinceById.get(String(selectedProvinceId));
     if (!selected?.feature?.geometry)
       return { type: "FeatureCollection", features: [] };
     // Highlight all provinces of the same country for whole-country selection
@@ -549,7 +565,7 @@ export default function MapView({
         properties: { id: String(p.id) },
       })),
     };
-  }, [selectedProvinceId, provinces]);
+  }, [selectedProvinceId, provinceById, provinces]);
 
   // ---------------------------------------------------------------------------
   // Tier 3 data: Inherit colors from tier 2
@@ -662,14 +678,14 @@ export default function MapView({
   // Pan to selected province
   useEffect(() => {
     if (selectedProvinceId === null) return;
-    const province = provinces.find((p) => p.id === selectedProvinceId);
+    const province = provinceById.get(String(selectedProvinceId));
     if (!province) return;
     mapRef.current?.flyTo({
       center: province.center,
       zoom: Math.max(mapRef.current.getZoom(), 4),
       duration: 800,
     });
-  }, [selectedProvinceId, provinces]);
+  }, [selectedProvinceId, provinceById]);
 
   // ---------------------------------------------------------------------------
   // Lazy load tier 3 data on zoom
@@ -720,9 +736,7 @@ export default function MapView({
           // For tier 3 clicks, map stateId back to regionId
           const regionId = features[0].properties?.regionId;
           if (regionId && features[0].layer?.id?.startsWith("states-")) {
-            const province = provinces.find(
-              (p) => String(p.id) === String(regionId)
-            );
+            const province = provinceById.get(String(regionId));
             if (province) {
               onSelectProvince(province.id);
               return;
@@ -730,7 +744,7 @@ export default function MapView({
           }
           // Direct tier 1/2 click
           const province =
-            provinces.find((p) => String(p.id) === String(clickedId)) ||
+            provinceById.get(String(clickedId)) ||
             provinces.find(
               (p) =>
                 (p.parentCountryId || String(p.id)) === String(clickedId)
@@ -741,7 +755,7 @@ export default function MapView({
         onSelectProvince(null);
       }
     },
-    [onSelectProvince, selectedProvinceId, provinces]
+    [onSelectProvince, selectedProvinceId, provinceById, provinces]
   );
 
   // ---------------------------------------------------------------------------
@@ -767,9 +781,9 @@ export default function MapView({
           const regionId = f.properties?.regionId;
           const province =
             (regionId && f.layer?.id?.startsWith("states-")
-              ? provinces.find((p) => String(p.id) === String(regionId))
+              ? provinceById.get(String(regionId))
               : null) ||
-            provinces.find((p) => String(p.id) === String(propId)) ||
+            provinceById.get(String(propId)) ||
             provinces.find(
               (p) =>
                 (p.parentCountryId || String(p.id)) === String(propId)
@@ -791,7 +805,7 @@ export default function MapView({
         setTooltipData(null);
       }
     },
-    [provinces, players]
+    [provinceById, provinces, players]
   );
 
   const handleMouseLeave = useCallback(() => {

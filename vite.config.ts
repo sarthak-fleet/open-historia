@@ -22,7 +22,14 @@ export default defineConfig(() => ({
     }),
     tailwindcss(),
   ],
+  css: {
+    transformer: "lightningcss",
+    lightningcss: {
+      drafts: { customMedia: true },
+    },
+  },
   build: {
+    cssMinify: "lightningcss",
     rollupOptions: {
       input: {
         app: path.resolve(__dirname, "app.html"),

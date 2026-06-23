@@ -72,7 +72,31 @@ function compressProvinceNames(names: string[]): string {
   return parts.join(", ");
 }
 
+// Cache geopolitical context strings by era bucket. The context is a pure
+// function of the year threshold, so there are only ~7 distinct strings —
+// memoizing avoids rebuilding the same string on every turn / diplomacy /
+// advisor call.
+const geopoliticalContextCache = new Map<string, string>();
+
 function buildGeopoliticalContext(year: number): string {
+  const eraKey =
+    year < 500 ? "ancient" :
+    year < 1500 ? "medieval" :
+    year < 1800 ? "early-modern" :
+    year < 1945 ? "modern" :
+    year < 1991 ? "cold-war" :
+    year <= 2025 ? "contemporary" :
+    "future";
+
+  const cached = geopoliticalContextCache.get(eraKey);
+  if (cached !== undefined) return cached;
+
+  const context = computeGeopoliticalContext(year);
+  geopoliticalContextCache.set(eraKey, context);
+  return context;
+}
+
+function computeGeopoliticalContext(year: number): string {
   if (year < 500) return `ANCIENT (pre-500 CE): Great empires (Rome/Byzantium, Persia, Han China, Maurya India, Egypt). City-states and tribal confederations. Power flows from river valleys, trade routes, and horse archers. Religion and governance inseparable. Dynastic marriages forge alliances, royal hostages guarantee treaties. Succession crises cause imperial collapse. Slavery is universal.`;
 
   if (year < 1500) return `MEDIEVAL (500-1500): Feudal Europe (kings, vassals, serfs), Islamic Caliphates, Byzantine Empire, Chinese dynasties (Tang-Song-Yuan-Ming), Mongol Empire. Catholic Church as European superpower -- popes crown kings. Crusades reshape Mediterranean. Silk Road and Indian Ocean trade. Black Death kills 30-60% of Europe. Gunpowder spreading from China. Trade republics (Venice, Genoa, Hansa) wield economic power.`;

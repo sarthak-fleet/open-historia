@@ -40,6 +40,22 @@ export default {
 
     const assetResponse = await env.ASSETS.fetch(request);
     if (assetResponse.status !== 404) {
+      // Long-cache static JSON map assets (TopoJSON, province data) at the edge
+      // and in the browser. These files are content-addressed by URL and change
+      // only on deploy, so aggressive caching is safe and avoids re-fetching
+      // multi-MB geography payloads on every navigation.
+      if (url.pathname.endsWith(".json")) {
+        const headers = new Headers(assetResponse.headers);
+        headers.set(
+          "Cache-Control",
+          "public, max-age=86400, s-maxage=604800",
+        );
+        return new Response(assetResponse.body, {
+          status: assetResponse.status,
+          statusText: assetResponse.statusText,
+          headers,
+        });
+      }
       return assetResponse;
     }
 

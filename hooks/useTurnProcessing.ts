@@ -87,7 +87,6 @@ export function useTurnProcessing(deps: {
       setProcessingTurn(true);
       const turnYear = turnOverride ?? gameState.turn;
       let nextEvents = [...events];
-      let nextRelations = [...relations];
 
       try {
         const provinceSummary = gameState.provinces
@@ -161,6 +160,33 @@ export function useTurnProcessing(deps: {
         let hasSignificantEvent = false;
         const turnEvents: string[] = [];
 
+        // Build O(1) province lookup maps once per turn instead of running
+        // 3x O(n) .find() scans per owner update. Province names and parent
+        // country names are immutable across turns — only ownerId changes —
+        // so the closure gameState.provinces is a safe source.
+        const provinceByNameLower = new globalThis.Map<string, typeof gameState.provinces[number]>();
+        const provinceByStrippedNameLower = new globalThis.Map<string, typeof gameState.provinces[number]>();
+        const provinceByParentLower = new globalThis.Map<string, typeof gameState.provinces[number]>();
+        for (const p of gameState.provinces) {
+          const lower = p.name.toLowerCase();
+          if (!provinceByNameLower.has(lower)) provinceByNameLower.set(lower, p);
+          const stripped = p.name.replace(/\s*\(.*\)$/, "").toLowerCase();
+          if (!provinceByStrippedNameLower.has(stripped)) provinceByStrippedNameLower.set(stripped, p);
+          if (!p.isSubNational) {
+            const parent = (p.parentCountryName || "").toLowerCase();
+            if (parent && !provinceByParentLower.has(parent)) provinceByParentLower.set(parent, p);
+          }
+        }
+
+        // Maintain relations in a Map keyed by the canonical (alphabetically
+        // sorted) nation pair so each relation update is O(1) instead of an
+        // O(n) array filter per update.
+        const relationByKey = new globalThis.Map<string, DiplomaticRelation>();
+        for (const r of relations) {
+          const key = r.nationA < r.nationB ? `${r.nationA}|${r.nationB}` : `${r.nationB}|${r.nationA}`;
+          relationByKey.set(key, r);
+        }
+
         if (data.updates) {
           data.updates.forEach((rawUpdate) => {
             const update = rawUpdate as Record<string, unknown>;
@@ -172,28 +198,19 @@ export function useTurnProcessing(deps: {
               setGameState((prev) => {
                 if (!prev) return null;
                 const pLower = provinceName.toLowerCase();
-                let target = prev.provinces.find(
-                  (p) => p.name.toLowerCase() === pLower
-                );
+                let target = provinceByNameLower.get(pLower);
                 if (!target) {
-                  target = prev.provinces.find(
-                    (p) =>
-                      p.name.toLowerCase().startsWith(pLower + " (") ||
-                      p.name.replace(/\s*\(.*\)$/, "").toLowerCase() === pLower
-                  );
+                  target = provinceByStrippedNameLower.get(pLower);
                 }
                 if (!target) {
-                  target = prev.provinces.find(
-                    (p) =>
-                      (p.parentCountryName || "").toLowerCase() === pLower &&
-                      !p.isSubNational
-                  );
+                  target = provinceByParentLower.get(pLower);
                 }
                 if (target) {
+                  const targetId = target.id;
                   return {
                     ...prev,
                     provinces: prev.provinces.map((p) =>
-                      p.id === target.id ? { ...p, ownerId: newOwner } : p
+                      p.id === targetId ? { ...p, ownerId: newOwner } : p
                     ),
                   };
                 }
@@ -241,14 +258,11 @@ export function useTurnProcessing(deps: {
                 type: (update.relationType as DiplomaticRelation["type"]) || "neutral",
                 treaties: [],
               };
-              nextRelations = nextRelations.filter(
-                (r) =>
-                  !(
-                    (r.nationA === rel.nationA && r.nationB === rel.nationB) ||
-                    (r.nationA === rel.nationB && r.nationB === rel.nationA)
-                  )
-              );
-              nextRelations = [...nextRelations, rel];
+              // O(1) replace via canonical pair key instead of O(n) array filter.
+              const relKey = rel.nationA < rel.nationB
+                ? `${rel.nationA}|${rel.nationB}`
+                : `${rel.nationB}|${rel.nationA}`;
+              relationByKey.set(relKey, rel);
 
               hasSignificantEvent = true;
               const relType = update.relationType as string;
@@ -270,6 +284,10 @@ export function useTurnProcessing(deps: {
             }
           });
         }
+
+        // Derive the final relations array from the Map (O(1) per update
+        // instead of O(n) array filtering).
+        const nextRelations = Array.from(relationByKey.values());
 
         setEvents(nextEvents.length > MAX_EVENTS ? nextEvents.slice(-MAX_EVENTS) : nextEvents);
         setRelations(nextRelations);
