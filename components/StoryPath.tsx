@@ -1,17 +1,15 @@
 
 import React, { useEffect, useRef, useState } from "react";
-import type { StoryPath, StoryStep } from "@/lib/types";
+import type { StoryPath } from "@/lib/types";
 import { PRESETS } from "@/lib/presets";
 
 interface StoryPathProps {
   storyPath: StoryPath;
-  currentTurn: number;
   completedStepIds: string[];
 }
 
 export default function StoryPath({
   storyPath,
-  currentTurn,
   completedStepIds,
 }: StoryPathProps) {
   const [minimized, setMinimized] = useState(false);

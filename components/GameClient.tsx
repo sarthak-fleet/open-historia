@@ -339,7 +339,6 @@ function GameClientInner({ initialGameId }: { initialGameId?: string } = {}) {
       {gameState && game.selectedPreset?.storyPath && (
         <StoryPath
           storyPath={game.selectedPreset.storyPath}
-          currentTurn={gameState.turn}
           completedStepIds={turn.completedStepIds}
         />
       )}

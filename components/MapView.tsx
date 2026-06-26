@@ -429,7 +429,7 @@ export default function MapView({
 
   // Tier 3 lazy loading
   const [tier3GeoJSON, setTier3GeoJSON] = useState<FeatureCollection | null>(null);
-  const [tier3Status, setTier3Status] = useState<
+  const [, setTier3Status] = useState<
     "idle" | "loading" | "error"
   >("idle");
   const tier3LoadedRef = useRef(false);
