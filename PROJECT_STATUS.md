@@ -1,6 +1,6 @@
 # open-historia — PROJECT STATUS
 
-Last updated: 2026-06-20
+Last updated: 2026-06-28
 
 ## Why/What
 
@@ -122,7 +122,6 @@ Browser → Cloudflare Worker
 2. Decide whether Story Rooms graduates into main game or stays local experiment.
 3. Improve diplomacy and nation behavior — inspectable, explainable turn consequences.
 4. Revisit CORS audit residuals before production expansion.
-5. Update `.github/workflows/deploy.yml` path filters — still reference removed `app/**`, `next.config.ts`, `open-next.config.ts`, `postcss.config.mjs`; should track `src/**` instead (changes CI trigger behavior, not docs).
 
 ### Deferred
 
