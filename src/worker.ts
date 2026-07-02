@@ -30,12 +30,25 @@ api.on(["GET", "POST"], "/api/auth/*", (c) => {
 api.route("/api/saves", savesRoutes);
 api.route("/api", llmRoutes);
 
+api.onError((err, c) => {
+  console.error(`[error] ${c.req.method} ${c.req.path}:`, err.message, err.stack);
+  return c.json({ error: "Internal Server Error" }, 500);
+});
+
 export default {
   async fetch(request: Request, env: WorkerEnv, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
 
     if (url.pathname.startsWith("/api/")) {
-      return api.fetch(request, env, ctx);
+      try {
+        return await api.fetch(request, env, ctx);
+      } catch (err) {
+        console.error(`[error] fetch ${url.pathname}:`, err instanceof Error ? err.message : err);
+        return new Response(JSON.stringify({ error: "Internal Server Error" }), {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
     }
 
     const assetResponse = await env.ASSETS.fetch(request);

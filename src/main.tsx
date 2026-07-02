@@ -9,10 +9,13 @@ import "@fontsource/jetbrains-mono/400.css";
 import "@fontsource-variable/playfair-display/index.css";
 
 import "@/src/styles/globals.css";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import { router } from "./router";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <ErrorBoundary>
+      <RouterProvider router={router} />
+    </ErrorBoundary>
   </StrictMode>,
 );
