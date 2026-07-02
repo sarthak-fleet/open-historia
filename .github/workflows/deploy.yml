@@ -1,48 +1,6 @@
 name: Deploy to Cloudflare Workers
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/deploy.yml'
-      - 'src/**'
-      - 'components/**'
-      - 'hooks/**'
-      - 'lib/**'
-      - 'public/**'
-      - 'landing-astro/**'
-      - 'scripts/**'
-      - 'app.html'
-      - 'index.html'
-      - 'vite.config.ts'
-      - 'drizzle.config.ts'
-      - 'eslint.config.js'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-      - 'tsconfig.json'
-      - 'wrangler.toml'
-  pull_request:
-    branches: [main]
-    paths:
-      - '.github/workflows/deploy.yml'
-      - 'src/**'
-      - 'components/**'
-      - 'hooks/**'
-      - 'lib/**'
-      - 'public/**'
-      - 'landing-astro/**'
-      - 'scripts/**'
-      - 'app.html'
-      - 'index.html'
-      - 'vite.config.ts'
-      - 'drizzle.config.ts'
-      - 'eslint.config.js'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-      - 'tsconfig.json'
-      - 'wrangler.toml'
-  pull_request_target:
-    types: [closed]
-
+  workflow_dispatch:
 jobs:
   deploy-production:
     if: github.event_name == 'push'
