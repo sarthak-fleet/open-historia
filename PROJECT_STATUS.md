@@ -1,6 +1,6 @@
 # open-historia — PROJECT STATUS
 
-Last updated: 2026-06-28
+Last updated: 2026-07-02
 
 ## Why/What
 
@@ -66,6 +66,7 @@ Browser → Cloudflare Worker
 
 ## Timeline
 
+- **2026-07-02** — Added `api.onError()` global error handler + outer try/catch in worker fetch handler; added React `<ErrorBoundary>` wrapping `RouterProvider` in `main.tsx`.
 - **Stack migration:** De-OpenNext complete — Vite SPA + Hono worker is current production path.
 - **Story Rooms v0.1:** local prototype at `/story-room` — no shared database with core strategy saves.
 - **README/AGENTS drift fixed (2026-06-23):** stack, deploy, and repo-structure sections now describe the Vite SPA + Hono worker stack.
