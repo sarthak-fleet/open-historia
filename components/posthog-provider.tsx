@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 
 import { trackReturned, trackSignup } from '@/lib/analytics';
 import { installBrowserMonitoring } from '@/lib/foundry-monitoring';
+import { initApiTiming } from '@/lib/api-timing';
 
 const SEEN_KEY = 'open-historia:seen';
 
@@ -33,7 +34,9 @@ function useSessionAnalytics() {
 
 export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    return installBrowserMonitoring();
+    const cleanup = installBrowserMonitoring();
+    initApiTiming();
+    return cleanup;
   }, []);
 
   useSessionAnalytics();
