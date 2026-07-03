@@ -117,16 +117,6 @@ export default function AboutPage() {
           the underlying map data.
         </p>
 
-        <h2 className="mt-8 text-xl font-semibold text-amber-500">Experiments &amp; prototypes</h2>
-        <p className="mt-2 text-sm leading-7 text-slate-300">
-          <Link to="/story-room" className="text-amber-400 underline decoration-dotted">
-            Story Room prototype
-          </Link>{" "}
-          — voted collaborative canon, branch archive (replay/revive), and fixture AI co-author
-          suggestions (StoryTunes). Isolated from core saves. See{" "}
-          <code className="text-[10px]">STORY-ROOMS.md</code> for the brief and placement note.
-        </p>
-
         <h2 className="mt-8 text-xl font-semibold text-amber-500">What it isn&apos;t</h2>
         <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-300">
           <li>A live multiplayer game. (Yet.)</li>

@@ -256,11 +256,13 @@ USSR Survives (1995), Byzantine Revival (1204), Climate Collapse (2040)
 ### Fictional
 Zombie Apocalypse (2026), AI Awakening (2030), Mars Colonization (2035)
 
-### Story Room Prototype (v0.1)
-Playful local demo of voted collaborative canon, branch archive (replay/revive), and fixture AI co-author suggestions (StoryTunes fit test). Completely isolated from core strategy saves.
-
-Try it: open `/story-room` (or `http://localhost:8787/story-room` while running).  
-Full brief and placement note: `STORY-ROOMS.md` in the repo root.
+### Story Room Prototype (v0.1) — ARCHIVED 2026-07-02
+The local collaborative-canon prototype (`/story-room`) has been **archived and removed from
+navigation**. It was a divergent, local-only experiment (no persistence, no API, no connection
+to the core strategy loop) that split polish from the primary grand-strategy experience. The
+code is retained in-repo (`components/StoryRoomPrototype.tsx`, `src/pages/StoryRoomPage.tsx`,
+`lib/story-room-fixtures.ts`, `STORY-ROOMS.md`) as an archived experiment; the route is no
+longer wired in `src/router.tsx`. See `PROJECT_STATUS.md` for the full decision rationale.
 
 ---
 

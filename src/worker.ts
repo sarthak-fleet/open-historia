@@ -7,7 +7,7 @@ import { bindWorkerEnv } from "./worker/bind-env";
 import llmRoutes from "./worker/routes/llm";
 import savesRoutes from "./worker/routes/saves";
 
-const SPA_PREFIXES = ["/play", "/about", "/privacy", "/story-room"];
+const SPA_PREFIXES = ["/play", "/about", "/privacy"];
 
 function isSpaRoute(pathname: string) {
   return SPA_PREFIXES.some(

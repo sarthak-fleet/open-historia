@@ -5,7 +5,12 @@ import AboutPage from "./pages/AboutPage";
 import GamePage from "./pages/GamePage";
 import NotFoundPage from "./pages/NotFoundPage";
 import PrivacyPage from "./pages/PrivacyPage";
-import StoryRoomPage from "./pages/StoryRoomPage";
+
+// NOTE: Story Rooms (/story-room) was archived on 2026-07-02 — the local-only
+// prototype split polish from the primary grand-strategy experience and had no
+// path to the core loop. The route was removed from navigation; the code
+// (StoryRoomPage, StoryRoomPrototype, story-room-fixtures) is retained in-repo
+// as an archived experiment. See PROJECT_STATUS.md for the decision rationale.
 
 export const router = createBrowserRouter([
   {
@@ -16,7 +21,6 @@ export const router = createBrowserRouter([
       { path: "play/:id", element: <GamePage /> },
       { path: "about", element: <AboutPage /> },
       { path: "privacy", element: <PrivacyPage /> },
-      { path: "story-room", element: <StoryRoomPage /> },
       { path: "*", element: <NotFoundPage /> },
     ],
   },
