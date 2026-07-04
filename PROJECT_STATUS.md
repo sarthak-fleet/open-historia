@@ -1,8 +1,10 @@
 # open-historia — PROJECT STATUS
 
-Last updated: 2026-07-02
+Last updated: 2026-07-04
 
 ## Why/What
+
+**Sub-product of [ai-game](../ai-game)** (the fleet's AI-game research umbrella). Separate repo and deploy, worked on together with ai-game as one research effort.
 
 **Thesis:** AI-powered grand strategy game — players issue natural-language commands; AI adjudicates outcomes, nation behavior, diplomacy, and emergent historical narratives. Single-player campaign loop is the focus.
 
