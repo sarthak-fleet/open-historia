@@ -1,5 +1,7 @@
 # open-historia — PROJECT STATUS
 
+Last updated: 2026-07-10
+
 Last updated: 2026-07-04
 
 ## Why/What
@@ -155,6 +157,7 @@ Browser → Cloudflare Worker
 - Paid multiplayer, marketplace scenarios, community publishing — behind stable single-player loop.
 - Story Rooms — archived 2026-07-02 (route removed from nav; code retained in-repo). Cloud persistence / API-backed AI for it will not be pursued.
 - Real-time multiplayer.
+- **Closure decision (2026-07-10):** pause new campaign features and retain the current single-player prototype under the ai-game research umbrella. Reopen only for a demonstrated coherent turn-cycle playtest.
 
 ### Blocked
 
