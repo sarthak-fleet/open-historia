@@ -1,5 +1,7 @@
 # open-historia — PROJECT STATUS
 
+**Portfolio state (2026-07-10): Archived.** Preserve the repository and last known-good build; reopen only for an explicit new research decision.
+
 Last updated: 2026-07-10
 
 Last updated: 2026-07-04
