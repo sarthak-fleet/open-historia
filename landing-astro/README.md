@@ -7,7 +7,7 @@ moves off `/`. See "Cutover blocker" below.
 
 ## Why a separate project?
 
-The Worker at `open-historia.sarthakagrawal927.workers.dev` currently
+The Worker at `historia.aliveville.com` currently
 serves the entire game at `/`. `app/page.tsx` returns
 `<GameClientWrapper />`, which `next/dynamic`-imports the full
 MapLibre GL game client with `ssr: false`. That means:

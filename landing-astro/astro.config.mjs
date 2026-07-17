@@ -10,11 +10,9 @@ import sitemap from '@astrojs/sitemap';
 // transformer and minifier (fleet web-stack standard, VoidZero / Vite
 // ecosystem). See ../../AGENTS.md → "Fleet web stack standard".
 //
-// `site:` points at the workers.dev origin because open-historia does
-// not have a custom domain yet. Post-cutover this becomes the canonical
-// host that Pages serves `/` from.
+// `site:` is the canonical production Worker domain.
 export default defineConfig({
-  site: 'https://open-historia.sarthakagrawal927.workers.dev',
+  site: 'https://historia.aliveville.com',
   output: 'static',
   trailingSlash: 'never',
   // Emit `about.html` rather than `about/index.html` — no 308 redirect

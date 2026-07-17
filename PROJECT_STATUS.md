@@ -2,9 +2,7 @@
 
 **Portfolio state (2026-07-10): Archived.** Preserve the repository and last known-good build; reopen only for an explicit new research decision.
 
-Last updated: 2026-07-10
-
-Last updated: 2026-07-04
+Last updated: 2026-07-17
 
 ## Why/What
 
@@ -72,6 +70,7 @@ Browser → Cloudflare Worker
 
 ## Timeline
 
+- **2026-07-17** — Assigned the canonical owned domain `historia.aliveville.com` to the production Cloudflare Worker.
 - **2026-07-02** — **Story Rooms archived.** Decision: hide, not graduate. The local-only `/story-room` prototype (v0.1) was a divergent collaborative-writing experiment with no persistence, no API, no tests, and no path to the core strategy loop; it split polish and confused users about the product. Removed the route from `src/router.tsx`, dropped `/story-room` from `SPA_PREFIXES` in `src/worker.ts`, and removed the AboutPage link. Code retained in-repo as an archived experiment (`StoryRoomPrototype.tsx`, `StoryRoomPage.tsx`, `lib/story-room-fixtures.ts`, `STORY-ROOMS.md`). Resolves planned item #2.
 - **2026-07-02** — Added `api.onError()` global error handler + outer try/catch in worker fetch handler; added React `<ErrorBoundary>` wrapping `RouterProvider` in `main.tsx`.
 - **Stack migration:** De-OpenNext complete — Vite SPA + Hono worker is current production path.

@@ -5,6 +5,10 @@ compatibility_flags = ["nodejs_compat"]
 
 assets = { directory = "dist", binding = "ASSETS" }
 
+routes = [
+  { pattern = "historia.aliveville.com", custom_domain = true }
+]
+
 [placement]
 mode = "smart"
 
@@ -17,3 +21,4 @@ cpu_ms = 30000
 
 [vars]
 NODE_ENV = "production"
+BETTER_AUTH_URL = "https://historia.aliveville.com"
