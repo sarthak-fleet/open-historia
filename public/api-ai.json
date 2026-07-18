@@ -1,0 +1,26 @@
+{
+  "name": "Open Historia",
+  "version": "1",
+  "url": "https://historia.aliveville.com",
+  "llms": "https://historia.aliveville.com/llms.txt",
+  "llmsFull": "https://historia.aliveville.com/llms-full.txt",
+  "sitemap": "https://historia.aliveville.com/sitemap.xml",
+  "robots": "https://historia.aliveville.com/robots.txt",
+  "markdown": {
+    "suffix": ".md",
+    "negotiation": true
+  },
+  "surfaces": [
+    {
+      "id": "home",
+      "url": "https://historia.aliveville.com/",
+      "md": "https://historia.aliveville.com/index.md",
+      "kind": "static",
+      "description": "Product home"
+    }
+  ],
+  "auth": {
+    "public": true,
+    "notes": "Auth-walled app routes are not agent-indexed unless listed here."
+  }
+}

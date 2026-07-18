@@ -1,0 +1,26 @@
+# Open Historia — full agent brief
+
+AI-powered grand-strategy history game — command nations through natural language.
+
+## Index
+
+# Open Historia
+
+AI grand-strategy history game.
+
+## Product links
+
+
+## Machine surfaces
+
+- https://historia.aliveville.com/llms.txt
+- https://historia.aliveville.com/llms-full.txt
+- https://historia.aliveville.com/api/ai
+- https://historia.aliveville.com/index.md
+- https://historia.aliveville.com/sitemap.xml
+- https://historia.aliveville.com/robots.txt
+
+## Contact / fleet
+
+- Fleet: https://sassmaker.com
+- Agent email for directory verification: sarthakagrawal@agentmail.to

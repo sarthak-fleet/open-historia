@@ -1,0 +1,16 @@
+# Open Historia
+
+> AI-powered grand-strategy history game — command nations through natural language.
+
+## Product
+
+
+## Machine surfaces
+
+- [Agent catalog](https://historia.aliveville.com/api/ai): JSON inventory of public surfaces
+- [Homepage markdown](https://historia.aliveville.com/index.md): Product brief without JS
+- [This index](https://historia.aliveville.com/llms.txt)
+
+## Optional
+
+- [Foundry](https://sassmaker.com): Parent fleet showcase
