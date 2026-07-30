@@ -1,16 +1,22 @@
 # Open Historia
 
-> AI-powered grand-strategy history game — command nations through natural language.
+> Open-source AI grand strategy where natural-language orders become validated changes to a living map, diplomacy network, and branching timeline.
 
-## Product
+## Public product
 
+- [Rewrite history with your own orders.](https://historia.aliveville.com/): Command a civilization in plain English while an AI Game Master adjudicates diplomacy, territory, events, and alternate history on a living world map.
+- [Start an AI grand-strategy campaign.](https://historia.aliveville.com/play): Start a public Open Historia campaign, choose a scenario and nation, issue natural-language orders, and watch the AI-adjudicated world respond.
+- [Steer history, one order at a time.](https://historia.aliveville.com/about): Learn how Open Historia turns natural-language strategy into validated map, diplomacy, event, and timeline updates across branching campaigns.
+- [Your campaigns are not public content.](https://historia.aliveville.com/privacy): Understand local and cloud saves, Google sign-in, AI-provider requests, optional stored API keys, analytics, and deletion in Open Historia.
 
-## Machine surfaces
+## Agent-readable surfaces
 
-- [Agent catalog](https://historia.aliveville.com/api/ai): JSON inventory of public surfaces
-- [Homepage markdown](https://historia.aliveville.com/index.md): Product brief without JS
-- [This index](https://historia.aliveville.com/llms.txt)
+- [Full product brief](https://historia.aliveville.com/llms-full.txt)
+- [Agent catalog](https://historia.aliveville.com/api/ai)
+- [HTML sitemap](https://historia.aliveville.com/sitemap.xml)
 
-## Optional
+Every URL in the sitemap has a substantive same-origin Markdown alternate and supports `Accept: text/markdown`.
 
-- [Foundry](https://sassmaker.com): Parent fleet showcase
+## Privacy boundary
+
+Saved campaigns, `/play/:id`, auth, APIs, player commands, and archived Story Rooms are excluded from public discovery.

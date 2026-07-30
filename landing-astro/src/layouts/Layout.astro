@@ -9,16 +9,18 @@
 import '@fontsource-variable/playfair-display';
 import '@fontsource-variable/geist';
 import '@/styles/landing.css';
+import {
+  publicRouteForPath,
+  routeMetadata,
+  structuredDataForRoute,
+} from '../../../public-route-contract.mjs';
 
-interface Props {
-  title: string;
-  description: string;
+const home = publicRouteForPath('/');
+const metadata = home ? routeMetadata(home) : null;
+const structuredData = home ? structuredDataForRoute(home) : null;
+if (!home || !metadata || !structuredData) {
+  throw new Error('Open Historia home route metadata is unavailable.');
 }
-
-const { title, description } = Astro.props;
-
-const SITE_URL = 'https://historia.aliveville.com';
-const OG_IMAGE = `${SITE_URL}/opengraph-image`;
 ---
 
 <!doctype html>
@@ -28,23 +30,30 @@ const OG_IMAGE = `${SITE_URL}/opengraph-image`;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#0B0F19" />
 
-    <title>{title}</title>
-    <meta name="description" content={description} />
+    <title>{metadata.title}</title>
+    <meta name="description" content={metadata.description} />
+    <meta name="robots" content={metadata.robots} />
     <meta name="application-name" content="Open Historia" />
 
-    <link rel="canonical" href={SITE_URL} />
+    <link rel="canonical" href={metadata.canonical} />
+    <link rel="alternate" type="text/markdown" href={metadata.markdown} />
 
     <meta property="og:type" content="website" />
-    <meta property="og:url" content={SITE_URL} />
+    <meta property="og:url" content={metadata.canonical} />
     <meta property="og:site_name" content="Open Historia" />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:image" content={OG_IMAGE} />
+    <meta property="og:title" content={metadata.title} />
+    <meta property="og:description" content={metadata.description} />
+    <meta property="og:image" content={metadata.image} />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={OG_IMAGE} />
+    <meta name="twitter:title" content={metadata.title} />
+    <meta name="twitter:description" content={metadata.description} />
+    <meta name="twitter:image" content={metadata.image} />
+
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(structuredData).replaceAll('<', '\\u003c')}
+    />
 
     <meta
       name="keywords"

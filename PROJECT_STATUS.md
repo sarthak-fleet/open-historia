@@ -2,7 +2,7 @@
 
 **Portfolio state (2026-07-10): Archived.** Preserve the repository and last known-good build; reopen only for an explicit new research decision.
 
-Last updated: 2026-07-17
+Last updated: 2026-07-31
 
 ## Why/What
 
@@ -24,7 +24,7 @@ Last updated: 2026-07-17
 - **Auth:** better-auth + Google OAuth (optional).
 - **AI:** free-ai-gateway chokepoint; Anthropic, OpenAI, Gemini, DeepSeek; in-memory rate limiting on AI routes (`lib/rate-limit.ts`).
 - **Offline saves:** Browser localStorage works without auth. Cloud saves require Turso + Google OAuth env vars.
-- **Repository:** github.com/sarthak-fleet/open-historia.
+- **Repository:** [github.com/sarthakagrawal927/open-historia](https://github.com/sarthakagrawal927/open-historia).
 
 ### Internal fleet
 
@@ -70,6 +70,7 @@ Browser → Cloudflare Worker
 
 ## Timeline
 
+- **2026-07-31** — Established one public-route contract for `/`, `/play`, `/about`, and `/privacy`. Each route now has source-derived metadata, structured data, crawlable HTML, substantive Markdown, sitemap/catalog parity, and agent-readable discovery. Saved campaigns, campaign identifiers, auth, operational APIs, and archived Story Rooms remain outside the public corpus.
 - **2026-07-17** — Assigned the canonical owned domain `historia.aliveville.com` to the production Cloudflare Worker.
 - **2026-07-02** — **Story Rooms archived.** Decision: hide, not graduate. The local-only `/story-room` prototype (v0.1) was a divergent collaborative-writing experiment with no persistence, no API, no tests, and no path to the core strategy loop; it split polish and confused users about the product. Removed the route from `src/router.tsx`, dropped `/story-room` from `SPA_PREFIXES` in `src/worker.ts`, and removed the AboutPage link. Code retained in-repo as an archived experiment (`StoryRoomPrototype.tsx`, `StoryRoomPage.tsx`, `lib/story-room-fixtures.ts`, `STORY-ROOMS.md`). Resolves planned item #2.
 - **2026-07-02** — Added `api.onError()` global error handler + outer try/catch in worker fetch handler; added React `<ErrorBoundary>` wrapping `RouterProvider` in `main.tsx`.
@@ -105,6 +106,7 @@ Browser → Cloudflare Worker
 | Grand strategy game | `/play`, `/play/:id` | Natural-language orders, map, diplomacy, timeline |
 | Story Rooms | _(archived 2026-07-02)_ | Local collaborative canon prototype (v0.1) — route removed from nav; code retained in-repo |
 | Marketing landing | `/` | Astro overlay with WWII sample timeline + CTA |
+| Public discovery | `/robots.txt`, `/sitemap.xml`, `/llms.txt`, `/llms-full.txt`, `/api/ai`, `/*.md` | Exact four-route SEO/GEO corpus derived from one contract |
 | Cloud saves | `/api/saves/*` | Turso persistence with optional Google auth |
 | Local saves | Browser localStorage | Works without authentication |
 
@@ -138,6 +140,9 @@ Browser → Cloudflare Worker
 
 ### Quality
 
+- The four canonical public routes have route-correct canonical, description, Open Graph, Twitter, JSON-LD, heading, and crawlable fallback content.
+- Every sitemap route has a substantive same-origin Markdown alternate; `/api/ai` catalogs exactly those four surfaces.
+- `/play/:id` is `noindex`, canonicalizes to `/play`, and never exposes saved campaign state through the sitemap, catalog, or Markdown.
 - React Compiler enabled.
 - Vitest + Playwright coverage; mobile e2e project.
 - Biome format/check in CI scripts.

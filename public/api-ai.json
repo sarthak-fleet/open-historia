@@ -16,11 +16,32 @@
       "url": "https://historia.aliveville.com/",
       "md": "https://historia.aliveville.com/index.md",
       "kind": "static",
-      "description": "Product home"
+      "description": "Command a civilization in plain English while an AI Game Master adjudicates diplomacy, territory, events, and alternate history on a living world map."
+    },
+    {
+      "id": "play",
+      "url": "https://historia.aliveville.com/play",
+      "md": "https://historia.aliveville.com/play.md",
+      "kind": "application",
+      "description": "Start a public Open Historia campaign, choose a scenario and nation, issue natural-language orders, and watch the AI-adjudicated world respond."
+    },
+    {
+      "id": "about",
+      "url": "https://historia.aliveville.com/about",
+      "md": "https://historia.aliveville.com/about.md",
+      "kind": "application",
+      "description": "Learn how Open Historia turns natural-language strategy into validated map, diplomacy, event, and timeline updates across branching campaigns."
+    },
+    {
+      "id": "privacy",
+      "url": "https://historia.aliveville.com/privacy",
+      "md": "https://historia.aliveville.com/privacy.md",
+      "kind": "application",
+      "description": "Understand local and cloud saves, Google sign-in, AI-provider requests, optional stored API keys, analytics, and deletion in Open Historia."
     }
   ],
   "auth": {
     "public": true,
-    "notes": "Auth-walled app routes are not agent-indexed unless listed here."
+    "notes": "Saved campaigns, campaign identifiers, auth, APIs, and archived Story Rooms are not public indexed documents."
   }
 }

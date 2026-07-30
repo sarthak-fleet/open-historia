@@ -11,16 +11,9 @@ import Cta from '@/components/Cta.astro';
 // has been moved off / (currently the game IS at /, so this link 404s
 // until cutover — see README).
 //
-// Title + description mirror app/layout.tsx metadata so the OG card,
-// canonical URL, and search snippets stay consistent with the rest of
-// the Worker-served routes.
-
-const TITLE = 'Open Historia — AI Grand Strategy Game';
-const DESCRIPTION =
-  'An open-source AI-powered grand strategy game spanning all of human history. Command nations, wage wars, forge alliances, and rewrite history with an intelligent Game Master.';
 ---
 
-<Layout title={TITLE} description={DESCRIPTION}>
+<Layout>
   <main class="oh-page">
     <Hero />
     <ValueProp />

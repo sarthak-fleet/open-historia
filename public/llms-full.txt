@@ -1,26 +1,170 @@
-# Open Historia — full agent brief
+# Open Historia — full public brief
 
-AI-powered grand-strategy history game — command nations through natural language.
+Open Historia is an open-source single-player grand-strategy research prototype. It uses an AI Game Master as an expressive rules engine while strict response validation, visible state changes, a timeline, and rewind controls make the results inspectable.
 
-## Index
+## Public corpus
 
-# Open Historia
+The canonical HTML corpus contains exactly four routes: `/`, `/play`, `/about`, and `/privacy`. The sitemap, catalog, metadata, and Markdown below derive from one route contract.
 
-AI grand-strategy history game.
+## Explicit exclusions
 
-## Product links
+- `/play/:id` can identify private campaign state and is noindex.
+- `/api/saves/*` and `/api/auth/*` are private operational routes.
+- Other APIs are not HTML documents.
+- `/story-room` is an archived experiment and is not routed or indexed.
+
+# Rewrite history with your own orders.
+
+> Canonical source: https://historia.aliveville.com/
+
+Command a civilization in plain English while an AI Game Master adjudicates diplomacy, territory, events, and alternate history on a living world map.
+
+Open Historia is a single-player grand-strategy game where natural-language decisions become changes on a living map. Choose a historical, modern, alternate, or fictional scenario, lead a nation, and tell the Game Master what you want to do.
+
+## Command through language
+
+Instead of navigating a fixed build queue, you issue orders in plain English. Raise an army, negotiate an alliance, fund a rebellion, reform an economy, or attempt a plan the interface never anticipated. The AI acts as the rules engine and explains what succeeds, what fails, and why.
+
+Each turn follows a strict response contract. The Game Master returns narrative, map updates, new events, diplomatic changes, and a compressed story-so-far. Open Historia validates that structure before it changes the campaign, keeping an open-ended game inspectable.
+
+## A world that responds
+
+The MapLibre world map moves between countries, regions, and detailed states as you zoom. Territory ownership and diplomatic borders change with the campaign. Direct conversations with other nations can create alliances, hostility, war, or vassal relationships.
+
+A timeline records the consequences of every turn. Rewind to an earlier snapshot, branch a different decision, and compare the alternate histories that follow. The point is not to reproduce one correct past, but to make cause and effect visible.
+
+## Play without surrendering control
+
+Guest play and local saves work without an account. Optional Google sign-in enables cloud saves. Players choose the AI provider used for adjudication, including supported hosted providers or a local OpenAI-compatible endpoint during development.
+
+Open Historia is open source and intentionally single-player. It is a research prototype for a coherent AI strategy loop, not a hidden hard-math simulation or a multiplayer marketplace. The public pages describe the product; campaign identifiers and saved state remain outside search and agent indexes.
+
+## Continue
+
+- [Start a campaign](https://historia.aliveville.com/play)
+- [How Open Historia works](https://historia.aliveville.com/about)
+- [Privacy](https://historia.aliveville.com/privacy)
+- [Source repository](https://github.com/sarthakagrawal927/open-historia)
 
 
-## Machine surfaces
+---
 
-- https://historia.aliveville.com/llms.txt
-- https://historia.aliveville.com/llms-full.txt
-- https://historia.aliveville.com/api/ai
-- https://historia.aliveville.com/index.md
-- https://historia.aliveville.com/sitemap.xml
-- https://historia.aliveville.com/robots.txt
+# Start an AI grand-strategy campaign.
 
-## Contact / fleet
+> Canonical source: https://historia.aliveville.com/play
 
-- Fleet: https://sassmaker.com
-- Agent email for directory verification: sarthakagrawal@agentmail.to
+Start a public Open Historia campaign, choose a scenario and nation, issue natural-language orders, and watch the AI-adjudicated world respond.
+
+The Play surface is the public entry to Open Historia's single-player campaign loop. It lets you choose a scenario, nation, AI provider, and difficulty before the map, command terminal, diplomacy, advisor, and timeline become your campaign workspace.
+
+## Choose the history you want to enter
+
+Preset scenarios cover historical eras such as the Second World War, the Cold War, and the fall of empires, alongside modern, alternate-history, and fictional starting points. You can also shape a custom scenario instead of accepting a preset premise.
+
+After selecting the civilization you control, you choose an AI provider and difficulty profile. Difficulty changes how the Game Master interprets risk, opposition, and generosity rather than hiding a fixed numerical bonus behind the interface.
+
+## Issue orders and inspect consequences
+
+Commands are written in ordinary language and can be queued before time advances. The Game Master adjudicates the batch against the current map, relationships, prior events, and running campaign summary. Returned updates are parsed and validated before they reach the client state.
+
+Consequences appear across the same workspace: territorial changes on the map, new entries in the timeline, diplomatic shifts, and an explanation in the terminal. The advisor can suggest military, diplomatic, or economic options without taking control away from the player.
+
+## Save locally or sign in for cloud saves
+
+A guest can play and retain local saves in the browser without creating an account. Optional sign-in enables cloud save management. Saved campaigns are user state, so their identifiers and contents are deliberately excluded from the public sitemap, agent catalog, and Markdown endpoints.
+
+The canonical public route is `/play`. A route such as `/play/:id` may resume a particular campaign, but it is marked noindex and canonicalized back to this public entry. Crawlers receive an explanation of the game template, never a player's private orders or state.
+
+## What the game does not claim
+
+Open Historia is not a deterministic military simulator. The AI is the rules engine, operating through a strict JSON contract, and its decisions can still be surprising or imperfect. The interface is designed to make those decisions readable and reversible.
+
+The current product is a single-player research prototype. Archived Story Rooms, multiplayer, scenario marketplaces, and community publishing are not part of this public game surface. The focus is one coherent loop from natural-language intent to inspectable world change.
+
+## Continue
+
+- [About the game loop](https://historia.aliveville.com/about)
+- [Read the privacy boundary](https://historia.aliveville.com/privacy)
+- [Return to Open Historia](https://historia.aliveville.com/)
+
+
+---
+
+# Steer history, one order at a time.
+
+> Canonical source: https://historia.aliveville.com/about
+
+Learn how Open Historia turns natural-language strategy into validated map, diplomacy, event, and timeline updates across branching campaigns.
+
+Open Historia is an open-source AI grand-strategy experiment. A player commands a civilization in plain English while a large-language-model Game Master adjudicates the turn and returns structured changes to a live map, diplomatic network, and branching timeline.
+
+## The campaign loop
+
+A campaign begins with a scenario, a player nation, an AI provider, and a difficulty profile. The player queues strategic orders and advances time. Those orders can concern armies, alliances, internal reform, covert action, economics, or any other plan that can be described clearly.
+
+The server sends the relevant campaign context to the selected model. The response must match a strict JSON shape containing narrative, state updates, new events, relationship changes, and an updated story-so-far. Invalid responses are rejected rather than applied blindly.
+
+## The map, diplomacy, and timeline
+
+The MapLibre map uses multiple levels of geographic detail so campaigns can move from global strategy to regional consequences. Province ownership and relationship borders visualize the Game Master's decisions instead of leaving the result trapped in prose.
+
+Diplomacy threads preserve conversations with other nations and track whether relations are neutral, friendly, allied, hostile, at war, or vassalized. Timeline snapshots let the player rewind to an earlier turn and branch an alternate history without erasing the path already explored.
+
+## AI provider and data boundaries
+
+Players choose among supported hosted providers or, in development, a local compatible endpoint. The campaign state required to adjudicate a turn is sent to that selected provider. Provider behavior and privacy terms therefore matter and are described before play.
+
+Guest campaigns can remain local to the browser. Optional authentication enables cloud saves through the server. Save records, campaign identifiers, commands, and generated state are private gameplay data and are never treated as public content for search or agent discovery.
+
+## Research scope
+
+The product asks whether an AI can serve as an expressive but inspectable strategy rules engine. The strict response contract, visible state changes, timeline, and rewind tools are all safeguards around that experiment rather than attempts to hide model uncertainty.
+
+Open Historia is currently single-player and paused as a maintained research prototype. Story Rooms was archived because its collaborative writing and canon-voting concept diverged from the strategy loop. Multiplayer, marketplaces, and generic writing tools remain out of scope.
+
+## Continue
+
+- [Play Open Historia](https://historia.aliveville.com/play)
+- [Privacy and data handling](https://historia.aliveville.com/privacy)
+- [Inspect the source](https://github.com/sarthakagrawal927/open-historia)
+
+
+---
+
+# Your campaigns are not public content.
+
+> Canonical source: https://historia.aliveville.com/privacy
+
+Understand local and cloud saves, Google sign-in, AI-provider requests, optional stored API keys, analytics, and deletion in Open Historia.
+
+Open Historia separates public product documentation from private gameplay. The public site explains how the game works, while campaign identifiers, saved states, command history, provider credentials, and account records stay outside search indexes and agent-readable catalogs.
+
+## Guest play and local saves
+
+You can begin a campaign without signing in. Local saves are stored by the browser on the device where you play, so they do not become server-side public pages. Clearing browser storage or changing devices can remove access to those local records.
+
+A local save contains the game information needed to restore a campaign, including ownership, command history, and the running story context used by the simulation. Open Historia does not publish that content, create sitemap routes for it, or expose it through Markdown negotiation.
+
+## Accounts and cloud saves
+
+Google sign-in is optional and is used to associate cloud saves with an account. The authentication system can store the account identifier, name, email address, and avatar supplied through OAuth. Cloud save records are handled by the authenticated save API.
+
+Save routes require the appropriate user context and are explicitly disallowed for crawlers. A campaign resume URL may contain an identifier, but it is marked noindex and canonicalized to the general Play page so the identifier never becomes part of the public corpus.
+
+## AI providers and credentials
+
+When you advance a turn, the campaign context needed for adjudication is sent to the AI provider selected in setup. That payload can include current world state, recent commands and logs, events, diplomacy, and the compressed story-so-far. The selected provider's privacy policy applies.
+
+If a player chooses to store an API key through the supported settings flow, the server stores an encrypted copy for that account. Provider keys are operational credentials, not public profile data, and are never included in the sitemap, agent catalog, or public Markdown.
+
+## Analytics, deletion, and scope
+
+The product does not use third-party advertising or remarketing to publish player behavior. Operational monitoring can measure whether the application works, but saved campaigns and commands are not shared as public content or sold as an audience.
+
+Players can delete individual saves through the product and can revoke the Google OAuth grant through their account controls. This page describes the current prototype boundary; provider retention, browser storage, and account revocation can have their own separate rules.
+
+## Continue
+
+- [Return to Open Historia](https://historia.aliveville.com/)
+- [Read how the game works](https://historia.aliveville.com/about)
+- [Open the public game entry](https://historia.aliveville.com/play)

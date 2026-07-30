@@ -4,31 +4,57 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0B0F19" />
-    <title>Open Historia — AI Grand Strategy Game</title>
-    <meta
-      name="description"
-      content="An open-source AI-powered grand strategy game spanning all of human history. Command nations, wage wars, forge alliances, and rewrite history with an intelligent Game Master."
-    />
-    <meta property="og:title" content="Open Historia — AI Grand Strategy Game" />
-    <meta
-      property="og:description"
-      content="Command nations across all of history with an AI Game Master. Open-source grand strategy in your browser."
-    />
+    <!-- PUBLIC_ROUTE_HEAD:START -->
+    <title>Play Open Historia — AI Grand Strategy</title>
+    <meta name="description" content="Start a public Open Historia campaign, choose a scenario and nation, issue natural-language orders, and watch the AI-adjudicated world respond." />
+    <meta name="robots" content="index,follow" />
+    <link rel="canonical" href="https://historia.aliveville.com/play" />
+    <link rel="alternate" type="text/markdown" href="https://historia.aliveville.com/play.md" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Open Historia" />
-    <meta property="og:image" content="/og.png" />
+    <meta property="og:url" content="https://historia.aliveville.com/play" />
+    <meta property="og:title" content="Play Open Historia — AI Grand Strategy" />
+    <meta property="og:description" content="Start a public Open Historia campaign, choose a scenario and nation, issue natural-language orders, and watch the AI-adjudicated world respond." />
+    <meta property="og:image" content="https://historia.aliveville.com/og.png" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Open Historia — AI Grand Strategy Game" />
-    <meta
-      name="twitter:description"
-      content="Command nations across all of history with an AI Game Master. Open-source grand strategy in your browser."
-    />
-    <meta name="twitter:image" content="/og.png" />
+    <meta name="twitter:title" content="Play Open Historia — AI Grand Strategy" />
+    <meta name="twitter:description" content="Start a public Open Historia campaign, choose a scenario and nation, issue natural-language orders, and watch the AI-adjudicated world respond." />
+    <meta name="twitter:image" content="https://historia.aliveville.com/og.png" />
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"Play Open Historia — AI Grand Strategy","description":"Start a public Open Historia campaign, choose a scenario and nation, issue natural-language orders, and watch the AI-adjudicated world respond.","url":"https://historia.aliveville.com/play","image":"https://historia.aliveville.com/og.png","isPartOf":{"@type":"WebSite","name":"Open Historia","url":"https://historia.aliveville.com/"},"genre":["Grand strategy","Historical simulation"],"gamePlatform":"Web Browser","playMode":"SinglePlayer","isAccessibleForFree":true}</script>
+    <!-- PUBLIC_ROUTE_HEAD:END -->
     <link rel="icon" href="/icon.png" type="image/png" />
     <link rel="apple-touch-icon" href="/apple-icon.png" />
+    <style>
+      #route-static-fallback {
+        min-height: 100vh;
+        box-sizing: border-box;
+        margin: 0;
+        padding: 3rem max(1.25rem, calc((100vw - 52rem) / 2));
+        background: #0b0f19;
+        color: #cbd5e1;
+        font: 16px/1.7 system-ui, sans-serif;
+      }
+      #route-static-fallback h1,
+      #route-static-fallback h2 {
+        color: #fbbf24;
+        line-height: 1.2;
+      }
+      #route-static-fallback h1 { font-size: clamp(2rem, 6vw, 4rem); }
+      #route-static-fallback h2 { margin-top: 2.5rem; }
+      #route-static-fallback a { color: #fbbf24; }
+      #route-static-fallback .route-eyebrow {
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        font-size: 0.75rem;
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- PUBLIC_ROUTE_FALLBACK:START -->
+    <main id="route-static-fallback" data-public-route="play"><header><p class="route-eyebrow">Public game entry</p><h1>Start an AI grand-strategy campaign.</h1><p>The Play surface is the public entry to Open Historia&#39;s single-player campaign loop. It lets you choose a scenario, nation, AI provider, and difficulty before the map, command terminal, diplomacy, advisor, and timeline become your campaign workspace.</p></header><section><h2>Choose the history you want to enter</h2><p>Preset scenarios cover historical eras such as the Second World War, the Cold War, and the fall of empires, alongside modern, alternate-history, and fictional starting points. You can also shape a custom scenario instead of accepting a preset premise.</p><p>After selecting the civilization you control, you choose an AI provider and difficulty profile. Difficulty changes how the Game Master interprets risk, opposition, and generosity rather than hiding a fixed numerical bonus behind the interface.</p></section><section><h2>Issue orders and inspect consequences</h2><p>Commands are written in ordinary language and can be queued before time advances. The Game Master adjudicates the batch against the current map, relationships, prior events, and running campaign summary. Returned updates are parsed and validated before they reach the client state.</p><p>Consequences appear across the same workspace: territorial changes on the map, new entries in the timeline, diplomatic shifts, and an explanation in the terminal. The advisor can suggest military, diplomatic, or economic options without taking control away from the player.</p></section><section><h2>Save locally or sign in for cloud saves</h2><p>A guest can play and retain local saves in the browser without creating an account. Optional sign-in enables cloud save management. Saved campaigns are user state, so their identifiers and contents are deliberately excluded from the public sitemap, agent catalog, and Markdown endpoints.</p><p>The canonical public route is `/play`. A route such as `/play/:id` may resume a particular campaign, but it is marked noindex and canonicalized back to this public entry. Crawlers receive an explanation of the game template, never a player&#39;s private orders or state.</p></section><section><h2>What the game does not claim</h2><p>Open Historia is not a deterministic military simulator. The AI is the rules engine, operating through a strict JSON contract, and its decisions can still be surprising or imperfect. The interface is designed to make those decisions readable and reversible.</p><p>The current product is a single-player research prototype. Archived Story Rooms, multiplayer, scenario marketplaces, and community publishing are not part of this public game surface. The focus is one coherent loop from natural-language intent to inspectable world change.</p></section><nav aria-label="Public Open Historia pages"><h2>Continue</h2><ul><li><a href="https://historia.aliveville.com/about">About the game loop</a></li><li><a href="https://historia.aliveville.com/privacy">Read the privacy boundary</a></li><li><a href="https://historia.aliveville.com/">Return to Open Historia</a></li></ul></nav></main>
+    <!-- PUBLIC_ROUTE_FALLBACK:END -->
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
