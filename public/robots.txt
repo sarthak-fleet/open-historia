@@ -1,10 +1,8 @@
 User-agent: *
 Allow: /
-Disallow: /api/
-
-Sitemap: https://open-historia.com/sitemap.xml
-# Agent indexing
-Allow: /llms.txt
-Allow: /llms-full.txt
-Allow: /index.md
+Allow: /*.md$
 Allow: /api/ai
+Disallow: /api/
+Disallow: /play/
+Disallow: /story-room
+Sitemap: https://historia.aliveville.com/sitemap.xml

@@ -1,26 +1,77 @@
 # Open Historia — full agent brief
 
-AI-powered grand-strategy history game — command nations through natural language.
+Open Historia is an open-source AI grand-strategy game. An AI Game Master adjudicates natural-language orders and returns structured changes to the map, diplomacy, events, and timeline.
 
-## Index
+# Rewrite history, one order at a time
 
-# Open Historia
+Open Historia is an open-source grand-strategy game where an AI Game Master adjudicates diplomacy, conflict, territory, and alternate timelines.
 
-AI grand-strategy history game.
+## Start playing
 
-## Product links
+Choose a historical, modern, alternate, or fictional scenario, command a nation in plain English, and watch the map and timeline respond.
 
+## Public product boundary
 
-## Machine surfaces
+The public site explains the game, its playable entry point, and its privacy policy. Saved campaigns and player state remain private.
 
-- https://historia.aliveville.com/llms.txt
-- https://historia.aliveville.com/llms-full.txt
-- https://historia.aliveville.com/api/ai
-- https://historia.aliveville.com/index.md
-- https://historia.aliveville.com/sitemap.xml
-- https://historia.aliveville.com/robots.txt
+## Canonical page
 
-## Contact / fleet
+https://historia.aliveville.com/
 
-- Fleet: https://sassmaker.com
-- Agent email for directory verification: sarthakagrawal@agentmail.to
+---
+
+# Start an alternate history
+
+Pick a scenario, nation, difficulty, and AI provider, then issue strategic orders in natural language.
+
+## How play works
+
+The AI Game Master returns structured consequences that update territory, diplomacy, events, and the campaign timeline.
+
+## Account boundary
+
+Guests can play with local saves. Sign-in enables private cloud saves; no save identifier or campaign state is part of public discovery.
+
+## Canonical page
+
+https://historia.aliveville.com/play
+
+---
+
+# Steer history, one order at a time
+
+Open Historia is an open-source AI grand-strategy game built around natural-language command and inspectable turn consequences.
+
+## AI as rules engine
+
+A large language model adjudicates each turn through a strict structured contract rather than fixed combat menus.
+
+## Rewind and branch
+
+Every turn becomes a timeline snapshot, so a player can revisit a prior decision and branch a new alternate history.
+
+## Canonical page
+
+https://historia.aliveville.com/about
+
+---
+
+# Privacy
+
+Guests can play locally. Signed-in identity, cloud saves, and saved provider keys are used only for the requested product functions.
+
+## What is stored
+
+Google OAuth identity and cloud saves are stored only when a player signs in. Saved API keys are encrypted.
+
+## Provider requests and deletion
+
+Turn context goes only to the AI provider selected by the player. Individual cloud saves can be deleted from the product.
+
+## Canonical page
+
+https://historia.aliveville.com/privacy
+
+## Discovery boundary
+
+Only the four canonical public pages above are indexed. Dynamic play identifiers, save and auth APIs, private gameplay state, and the archived Story Room are excluded.

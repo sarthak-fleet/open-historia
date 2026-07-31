@@ -19,6 +19,13 @@ const { title, description } = Astro.props;
 
 const SITE_URL = 'https://historia.aliveville.com';
 const OG_IMAGE = `${SITE_URL}/opengraph-image`;
+const structuredData = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Open Historia',
+  description,
+  url: `${SITE_URL}/`,
+});
 ---
 
 <!doctype html>
@@ -32,10 +39,10 @@ const OG_IMAGE = `${SITE_URL}/opengraph-image`;
     <meta name="description" content={description} />
     <meta name="application-name" content="Open Historia" />
 
-    <link rel="canonical" href={SITE_URL} />
+    <link rel="canonical" href={`${SITE_URL}/`} />
 
     <meta property="og:type" content="website" />
-    <meta property="og:url" content={SITE_URL} />
+    <meta property="og:url" content={`${SITE_URL}/`} />
     <meta property="og:site_name" content="Open Historia" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -45,6 +52,7 @@ const OG_IMAGE = `${SITE_URL}/opengraph-image`;
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={OG_IMAGE} />
+    <script type="application/ld+json" set:html={structuredData} />
 
     <meta
       name="keywords"
