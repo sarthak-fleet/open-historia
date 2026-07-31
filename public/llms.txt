@@ -2,15 +2,15 @@
 
 > AI-powered grand-strategy history game — command nations through natural language.
 
-## Product
+## Public pages
 
+- [Rewrite history, one order at a time](https://historia.aliveville.com/index.md): Command nations across human history with natural-language orders and an AI Game Master.
+- [Start an alternate history](https://historia.aliveville.com/play.md): Choose a scenario and command a civilization with natural-language orders in Open Historia.
+- [Steer history, one order at a time](https://historia.aliveville.com/about.md): Learn how Open Historia combines natural-language strategy, an AI rules engine, and rewindable timelines.
+- [Privacy](https://historia.aliveville.com/privacy.md): How Open Historia handles sign-in identity, private saves, provider requests, and deletion.
 
 ## Machine surfaces
 
-- [Agent catalog](https://historia.aliveville.com/api/ai): JSON inventory of public surfaces
-- [Homepage markdown](https://historia.aliveville.com/index.md): Product brief without JS
-- [This index](https://historia.aliveville.com/llms.txt)
-
-## Optional
-
-- [Foundry](https://sassmaker.com): Parent fleet showcase
+- [Agent catalog](https://historia.aliveville.com/api/ai)
+- [Sitemap](https://historia.aliveville.com/sitemap.xml)
+- [Robots](https://historia.aliveville.com/robots.txt)

@@ -2,7 +2,7 @@
 
 **Portfolio state (2026-07-10): Archived.** Preserve the repository and last known-good build; reopen only for an explicit new research decision.
 
-Last updated: 2026-07-17
+Last updated: 2026-08-01
 
 ## Why/What
 
@@ -70,6 +70,7 @@ Browser → Cloudflare Worker
 
 ## Timeline
 
+- **2026-08-01** — Completed a four-route public discovery boundary for `/`, `/play`, `/about`, and `/privacy`: canonical HTML metadata and crawlable fallback content, equivalent Markdown, and matching runtime sitemap and agent catalog. Dynamic play identifiers, saves, auth/API paths, private game state, and archived Story Room remain excluded. No deployment, migration, or data publication was performed.
 - **2026-07-17** — Assigned the canonical owned domain `historia.aliveville.com` to the production Cloudflare Worker.
 - **2026-07-02** — **Story Rooms archived.** Decision: hide, not graduate. The local-only `/story-room` prototype (v0.1) was a divergent collaborative-writing experiment with no persistence, no API, no tests, and no path to the core strategy loop; it split polish and confused users about the product. Removed the route from `src/router.tsx`, dropped `/story-room` from `SPA_PREFIXES` in `src/worker.ts`, and removed the AboutPage link. Code retained in-repo as an archived experiment (`StoryRoomPrototype.tsx`, `StoryRoomPage.tsx`, `lib/story-room-fixtures.ts`, `STORY-ROOMS.md`). Resolves planned item #2.
 - **2026-07-02** — Added `api.onError()` global error handler + outer try/catch in worker fetch handler; added React `<ErrorBoundary>` wrapping `RouterProvider` in `main.tsx`.
@@ -135,6 +136,9 @@ Browser → Cloudflare Worker
 ### Landing & activation
 
 - Astro landing at `/` with WWII sample timeline from `ww2-1939` preset + "Start exploring" CTA in `PresetBrowser`.
+- Four canonical public routes share one discovery contract with HTML metadata,
+  structured data, Markdown mirrors, an HTML-only sitemap, and `/api/ai`; see
+  [`docs/public-discovery.md`](docs/public-discovery.md).
 
 ### Quality
 

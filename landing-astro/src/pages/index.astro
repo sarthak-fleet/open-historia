@@ -4,6 +4,7 @@ import Hero from '@/components/Hero.astro';
 import ValueProp from '@/components/ValueProp.astro';
 import Features from '@/components/Features.astro';
 import Cta from '@/components/Cta.astro';
+import { publicRoute } from '../../../src/public-routes';
 
 // Open Historia landing.
 //
@@ -15,12 +16,11 @@ import Cta from '@/components/Cta.astro';
 // canonical URL, and search snippets stay consistent with the rest of
 // the Worker-served routes.
 
-const TITLE = 'Open Historia — AI Grand Strategy Game';
-const DESCRIPTION =
-  'An open-source AI-powered grand strategy game spanning all of human history. Command nations, wage wars, forge alliances, and rewrite history with an intelligent Game Master.';
+const HOME = publicRoute('/');
+if (!HOME) throw new Error('Missing canonical home route');
 ---
 
-<Layout title={TITLE} description={DESCRIPTION}>
+<Layout title={HOME.title} description={HOME.description}>
   <main class="oh-page">
     <Hero />
     <ValueProp />
