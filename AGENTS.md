@@ -13,7 +13,7 @@ AI grand-strategy history game — players issue natural language commands to co
 - Language: TypeScript (strict)
 - Styling: Tailwind CSS v4 (`@tailwindcss/vite`; dark/monospace; amber = actions, emerald = success, rose = war)
 - Map: MapLibre GL JS (WebGL) via `react-map-gl/maplibre` — 3-tier hierarchical LOD
-- DB: Turso (libSQL) + Drizzle ORM
+- DB: Cloudflare D1 + Drizzle ORM
 - Auth: better-auth (Google OAuth, optional + Drizzle adapter)
 - AI: multi-provider, called server-side in `src/worker/routes/llm.ts` — Anthropic, OpenAI, Google Gemini, DeepSeek, free-ai-gateway, local dev bridge
 - Testing: Vitest unit (`lib/__tests__/`) + Playwright e2e (`e2e/`, desktop + mobile)
@@ -31,7 +31,7 @@ src/
     bind-env.ts         # Binds WorkerEnv onto module-level accessors per request
     routes/
       llm.ts            # POST /api/turn, /api/chat, /api/advisor — multi-provider LLM calls
-      saves.ts          # /api/saves CRUD + /api/saves/upload (Turso, Drizzle)
+      saves.ts          # /api/saves CRUD + /api/saves/upload (D1, Drizzle)
   pages/                # Route components: GamePage, AboutPage, PrivacyPage, StoryRoomPage, NotFoundPage
   styles/globals.css    # Tailwind v4 entry
 components/
@@ -68,7 +68,7 @@ lib/
   crypto.ts             # API key encryption helpers
   db/
     schema.ts           # Drizzle schema: user/session/account/verification + saved_game
-    index.ts            # createDb() — Turso libSQL client (libsql/web)
+    index.ts            # createDb() — Drizzle over the Worker D1 binding
 landing-astro/          # Astro marketing landing, overlaid at / by scripts/overlay-astro-landing.mjs
 public/
   world-50m.json        # TopoJSON world (mid-res, primary)
@@ -100,9 +100,8 @@ pnpm format | pnpm check  # biome
 
 # Database
 pnpm db:generate  # drizzle-kit generate (migration files)
-pnpm db:migrate   # drizzle-kit migrate
-pnpm db:push      # drizzle-kit push (apply schema to Turso)
-pnpm db:studio    # drizzle-kit studio
+pnpm db:migrate:local   # apply migrations to isolated local D1
+pnpm db:migrate:remote  # apply reviewed migrations to production D1
 ```
 
 ## Architecture notes
@@ -116,7 +115,7 @@ pnpm db:studio    # drizzle-kit studio
 - **Save format**: only `provinceOwners` (id + ownerId) serialized — survives TopoJSON ID changes.
 - **Province name matching**: AI may return fuzzy names — `findProvince()` tries exact → suffix-stripped → parent country name.
 - **`MapView.tsx` and `GameClient.tsx`** are the largest files — be careful with edits.
-- Worker env / secrets (`lib/worker-env.ts`, `.env.example`): `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `AI_GATEWAY_API_KEY` (legacy alias `FREE_AI_API_KEY`), `FREE_AI_GATEWAY_URL`, `LOCAL_AI_URL`. Vite-baked client vars use the `VITE_` prefix.
+- Worker bindings and secrets (`lib/worker-env.ts`, `wrangler.toml`): D1 binding `DB`, plus `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `AI_GATEWAY_API_KEY` (legacy alias `FREE_AI_API_KEY`), `FREE_AI_GATEWAY_URL`, and `LOCAL_AI_URL`. Vite-baked client vars use the `VITE_` prefix.
 
 <!-- FLEET-GUIDANCE:START -->
 

@@ -1,6 +1,7 @@
+import type { DbEnv } from "./db";
+
 export type WorkerEnv = {
-  TURSO_DATABASE_URL: string;
-  TURSO_AUTH_TOKEN?: string;
+  DB: DbEnv["DB"];
   BETTER_AUTH_SECRET: string;
   BETTER_AUTH_URL: string;
   BETTER_AUTH_BASE_URL?: string;

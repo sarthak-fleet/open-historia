@@ -1,8 +1,6 @@
 import type { WorkerEnv } from "../../lib/worker-env";
 
 const STRING_KEYS: (keyof WorkerEnv)[] = [
-  "TURSO_DATABASE_URL",
-  "TURSO_AUTH_TOKEN",
   "BETTER_AUTH_SECRET",
   "BETTER_AUTH_URL",
   "BETTER_AUTH_BASE_URL",

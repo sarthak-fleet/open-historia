@@ -22,3 +22,9 @@ cpu_ms = 30000
 [vars]
 NODE_ENV = "production"
 BETTER_AUTH_URL = "https://historia.aliveville.com"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "open-historia"
+database_id = "9f68ece6-eee9-4faf-86aa-55c91b2b7936"
+migrations_dir = "drizzle"
