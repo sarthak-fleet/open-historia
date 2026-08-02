@@ -10,7 +10,7 @@ Last updated: 2026-08-01
 
 **Thesis:** AI-powered grand strategy game — players issue natural-language commands; AI adjudicates outcomes, nation behavior, diplomacy, and emergent historical narratives. Single-player campaign loop is the focus.
 
-**In scope:** Vite + React SPA game, Hono worker API, MapLibre 3-tier map, diplomacy engine, order queue, timeline rewind, AI advisor, 20+ scenario presets, optional cloud saves (Turso + Google auth), Astro marketing landing at `/`.
+**In scope:** Vite + React SPA game, Hono worker API, MapLibre 3-tier map, diplomacy engine, order queue, timeline rewind, AI advisor, 20+ scenario presets, optional cloud saves (Cloudflare D1 + Google auth), Astro marketing landing at `/`.
 
 **Out / parked:** Multiplayer, marketplace scenarios, generic collaborative writing unless it strengthens the game. **Story Rooms archived 2026-07-02** (see Decision below) — local-only prototype removed from navigation; code retained in-repo.
 
@@ -20,10 +20,10 @@ Last updated: 2026-08-01
 
 - **Deploy:** Cloudflare Workers (Hono worker + Vite static assets).
 - **Map:** MapLibre GL JS + Natural Earth / world-atlas TopoJSON.
-- **DB:** Turso (libSQL) + Drizzle — cloud saves.
+- **DB:** Cloudflare D1 + Drizzle — cloud saves.
 - **Auth:** better-auth + Google OAuth (optional).
 - **AI:** free-ai-gateway chokepoint; Anthropic, OpenAI, Gemini, DeepSeek; in-memory rate limiting on AI routes (`lib/rate-limit.ts`).
-- **Offline saves:** Browser localStorage works without auth. Cloud saves require Turso + Google OAuth env vars.
+- **Offline saves:** Browser localStorage works without auth. Cloud saves require the D1 binding and Google OAuth configuration.
 - **Repository:** github.com/sarthak-fleet/open-historia.
 
 ### Internal fleet
@@ -39,7 +39,7 @@ Last updated: 2026-08-01
 | Game routes | `/play`, `/play/:id`, `/about`, `/privacy` |
 | Map | MapLibre GL JS + Natural Earth / world-atlas TopoJSON |
 | Worker | Hono on Cloudflare Workers — `src/worker.ts` + `src/worker/routes/*` |
-| DB | Turso (libSQL) + Drizzle — cloud saves |
+| DB | Cloudflare D1 + Drizzle — cloud saves |
 | Auth | better-auth + Google OAuth (optional) |
 | AI | free-ai-gateway chokepoint |
 | Landing | `landing-astro/` overlaid at `/` |
@@ -59,7 +59,7 @@ pnpm format | pnpm check    # biome
 ```
 Browser → Cloudflare Worker
   ├─ /api/auth/*     better-auth handler
-  ├─ /api/saves/*    Turso CRUD + upload
+  ├─ /api/saves/*    D1 CRUD + upload
   ├─ /api/turn       execute commands (LLM proxy)
   ├─ /api/chat       diplomacy chat
   ├─ /api/advisor    strategic advice
@@ -70,6 +70,7 @@ Browser → Cloudflare Worker
 
 ## Timeline
 
+- **2026-08-02** — Migrated cloud-save and Better Auth persistence from Turso/libSQL to the project-owned Cloudflare D1 database; production now uses the `DB` binding.
 - **2026-08-01** — Completed a four-route public discovery boundary for `/`, `/play`, `/about`, and `/privacy`: canonical HTML metadata and crawlable fallback content, equivalent Markdown, and matching runtime sitemap and agent catalog. Dynamic play identifiers, saves, auth/API paths, private game state, and archived Story Room remain excluded. No deployment, migration, or data publication was performed.
 - **2026-07-17** — Assigned the canonical owned domain `historia.aliveville.com` to the production Cloudflare Worker.
 - **2026-07-02** — **Story Rooms archived.** Decision: hide, not graduate. The local-only `/story-room` prototype (v0.1) was a divergent collaborative-writing experiment with no persistence, no API, no tests, and no path to the core strategy loop; it split polish and confused users about the product. Removed the route from `src/router.tsx`, dropped `/story-room` from `SPA_PREFIXES` in `src/worker.ts`, and removed the AboutPage link. Code retained in-repo as an archived experiment (`StoryRoomPrototype.tsx`, `StoryRoomPage.tsx`, `lib/story-room-fixtures.ts`, `STORY-ROOMS.md`). Resolves planned item #2.
@@ -106,7 +107,7 @@ Browser → Cloudflare Worker
 | Grand strategy game | `/play`, `/play/:id` | Natural-language orders, map, diplomacy, timeline |
 | Story Rooms | _(archived 2026-07-02)_ | Local collaborative canon prototype (v0.1) — route removed from nav; code retained in-repo |
 | Marketing landing | `/` | Astro overlay with WWII sample timeline + CTA |
-| Cloud saves | `/api/saves/*` | Turso persistence with optional Google auth |
+| Cloud saves | `/api/saves/*` | Cloudflare D1 persistence with optional Google auth |
 | Local saves | Browser localStorage | Works without authentication |
 
 ## Features (shipped)
@@ -123,7 +124,7 @@ Browser → Cloudflare Worker
 
 ### Persistence & auth
 
-- Turso persistence for cloud saves; Drizzle schema + migrations.
+- Cloudflare D1 persistence for cloud saves; Drizzle schema + deterministic migrations.
 - better-auth Google login; save CRUD + upload endpoints in worker.
 - Local-only saves without authentication.
 

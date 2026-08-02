@@ -11,10 +11,10 @@ Open Historia is a unique strategy game where you command nations using natural 
 | Concern | Service |
 |---------|---------|
 | Hosting | Cloudflare Workers (`open-historia`) — Hono worker (`src/worker.ts`) serving a Vite/React SPA + Astro landing via the `ASSETS` binding |
-| Database | Turso (libSQL) via Drizzle ORM |
+| Database | Cloudflare D1 via Drizzle ORM |
 | Auth | better-auth + Google OAuth (optional) |
 | AI | free-ai-gateway chokepoint; Anthropic, OpenAI, Google Gemini & DeepSeek APIs supported (server-side in `src/worker/routes/llm.ts`) |
-| CI/CD | GitHub Actions — `pnpm cf:build` + `wrangler deploy` on push to `main` (PRs get preview workers) |
+| CI/CD | GitHub Actions — CI on pushes/PRs; manual SHA-tagged production deployment from `main` |
 
 Rate limiting on AI routes is an in-memory sliding-window limiter (`lib/rate-limit.ts`).
 
@@ -86,7 +86,7 @@ graph TB
     end
 
     subgraph "Data Storage"
-        Turso[("Turso SQLite - Cloud DB")]
+        D1[("Cloudflare D1")]
         LocalStorage["Browser LocalStorage - Offline Saves"]
     end
 
@@ -116,9 +116,9 @@ graph TB
     Advisor --> GPT
     Advisor --> Gemini
 
-    Saves --> Turso
+    Saves --> D1
     Saves --> LocalStorage
-    Auth --> Turso
+    Auth --> D1
 
     style UI fill:#4a90e2
     style Map fill:#4a90e2
@@ -133,7 +133,7 @@ graph TB
     style Gemini fill:#f4a261
     style DeepSeek fill:#f4a261
     style Local fill:#f4a261
-    style Turso fill:#e76f51
+    style D1 fill:#e76f51
     style LocalStorage fill:#e76f51
 ```
 
@@ -143,7 +143,7 @@ graph TB
 - **Hono on Cloudflare Workers** for the API + asset serving (`src/worker.ts`)
 - **MapLibre GL JS** for WebGL map rendering with hierarchical LOD (Natural Earth 50m data)
 - **Tailwind CSS 4** for dark-themed UI
-- **Turso + Drizzle** for cloud saves (optional)
+- **Cloudflare D1 + Drizzle** for cloud saves (optional)
 - **Better Auth** with Google OAuth (optional)
 - **Multi-AI Support**: Claude, GPT-4, Gemini, DeepSeek, free-ai-gateway, or local development mode
 
@@ -153,7 +153,7 @@ graph TB
 - **Worker API**: Hono routes (`src/worker/routes/*.ts`) handle AI provider calls and data persistence server-side
 - **Game Engine**: Client-side game state management with turn-based execution
 - **AI Integration**: Unified server-side interface to multiple AI providers with prompt engineering
-- **Storage Layer**: Dual-mode saves (cloud via Turso or local browser storage)
+- **Storage Layer**: Dual-mode saves (cloud via D1 or local browser storage)
 
 ---
 
@@ -186,13 +186,10 @@ pnpm dev
 
 ### Optional: Cloud Saves Setup
 
-For cross-device saves and authentication, create `.env.local`:
+For cross-device saves and authentication, run the Worker locally so Wrangler
+provides the local `DB` binding, then configure the non-database auth values:
 
 ```env
-# Turso Database (cloud saves)
-TURSO_DATABASE_URL=libsql://your-db.turso.io
-TURSO_AUTH_TOKEN=your-token
-
 # Better Auth
 BETTER_AUTH_SECRET=random-32-char-secret
 BETTER_AUTH_URL=http://localhost:8787
@@ -205,12 +202,12 @@ GOOGLE_CLIENT_SECRET=your-secret
 Then run database migrations:
 
 ```bash
-pnpm db:generate  # Generate migrations
-pnpm db:push      # Apply to Turso
-pnpm db:studio    # Browse database
+pnpm db:generate       # Generate migrations
+pnpm db:migrate:local  # Apply to isolated local D1
 ```
 
-**Note**: The game works fully offline with local saves if you skip this step.
+Production schema changes use `pnpm db:migrate:remote` after review. The game
+works fully offline with local saves if you skip cloud-save authentication.
 
 ---
 
