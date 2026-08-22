@@ -8,6 +8,7 @@ import llmRoutes from './worker/routes/llm';
 import savesRoutes from './worker/routes/saves';
 import {
   agentCatalog,
+  openApiSpec,
   publicRoute,
   renderMarkdown,
   renderPublicHtml,
@@ -55,6 +56,12 @@ export default {
 
     if (request.method === 'GET' && url.pathname === '/api/ai') {
       return Response.json(agentCatalog(origin), {
+        headers: { 'Cache-Control': 'public, max-age=300' },
+      });
+    }
+
+    if (request.method === 'GET' && url.pathname === '/openapi.json') {
+      return Response.json(openApiSpec(origin), {
         headers: { 'Cache-Control': 'public, max-age=300' },
       });
     }
