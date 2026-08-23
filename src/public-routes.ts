@@ -146,6 +146,126 @@ export function sitemapXml(origin = PUBLIC_ORIGIN): string {
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
 }
 
+type OpenApiPathItem = {
+  get: {
+    tags: string[];
+    summary: string;
+    description: string;
+    parameters?: unknown[];
+    responses: Record<
+      number,
+      { description: string; content: Record<string, { schema: { type: string } }> }
+    >;
+  };
+};
+
+const MACHINE_SURFACES: ReadonlyArray<{
+  path: string;
+  tag: string;
+  summary: string;
+  description: string;
+  responseDescription: string;
+  contentType: string;
+  schemaType: string;
+}> = [
+  {
+    path: '/api/ai',
+    tag: 'agent-surfaces',
+    summary: 'Agent catalog',
+    description:
+      'JSON inventory of all public agent surfaces, public routes, and exclusions.',
+    responseDescription: 'Agent catalog JSON',
+    contentType: 'application/json',
+    schemaType: 'object',
+  },
+  {
+    path: '/openapi.json',
+    tag: 'agent-surfaces',
+    summary: 'OpenAPI specification',
+    description: 'OpenAPI 3.1 description of public agent and page surfaces.',
+    responseDescription: 'OpenAPI 3.1 JSON',
+    contentType: 'application/json',
+    schemaType: 'object',
+  },
+  {
+    path: '/sitemap.xml',
+    tag: 'agent-surfaces',
+    summary: 'Sitemap',
+    description: 'Canonical XML sitemap of public routes.',
+    responseDescription: 'XML sitemap',
+    contentType: 'application/xml',
+    schemaType: 'string',
+  },
+  {
+    path: '/robots.txt',
+    tag: 'agent-surfaces',
+    summary: 'Robots policy',
+    description: 'Crawler allow/disallow rules and sitemap pointer.',
+    responseDescription: 'Plain-text robots policy',
+    contentType: 'text/plain',
+    schemaType: 'string',
+  },
+];
+
+function machinePathItem(surface: (typeof MACHINE_SURFACES)[number]): OpenApiPathItem {
+  return {
+    get: {
+      tags: [surface.tag],
+      summary: surface.summary,
+      description: surface.description,
+      responses: {
+        200: {
+          description: surface.responseDescription,
+          content: {
+            [surface.contentType]: { schema: { type: surface.schemaType } },
+          },
+        },
+      },
+    },
+  };
+}
+
+function publicPagePathItem(route: PublicRoute): OpenApiPathItem {
+  return {
+    get: {
+      tags: ['public-pages'],
+      summary: route.title,
+      description: route.description,
+      responses: {
+        200: {
+          description: 'HTML page with a Markdown alternate.',
+          content: {
+            'text/html': { schema: { type: 'string' } },
+            'text/markdown': { schema: { type: 'string' } },
+          },
+        },
+      },
+    },
+  };
+}
+
+export function openApiSpec(origin = PUBLIC_ORIGIN) {
+  return {
+    openapi: '3.1.0',
+    info: {
+      title: 'Open Historia',
+      version: '1.0.0',
+      description:
+        'Open-source AI grand-strategy game where an AI Game Master adjudicates natural-language commands.',
+      contact: { url: origin },
+    },
+    servers: [{ url: origin }],
+    tags: [
+      { name: 'agent-surfaces', description: 'Machine-readable discovery surfaces' },
+      { name: 'public-pages', description: 'Public HTML pages with Markdown alternates' },
+    ],
+    paths: Object.fromEntries([
+      ...MACHINE_SURFACES.map((surface) => [surface.path, machinePathItem(surface)]),
+      ...PUBLIC_ROUTES.map((route) => [route.path, publicPagePathItem(route)]),
+    ]),
+  };
+}
+
 function escapeHtml(value: string): string {
   return value.replace(
     /[&<>"']/g,

@@ -8,11 +8,15 @@ import llmRoutes from './worker/routes/llm';
 import savesRoutes from './worker/routes/saves';
 import {
   agentCatalog,
+  openApiSpec,
   publicRoute,
   renderMarkdown,
   renderPublicHtml,
   sitemapXml,
 } from './public-routes';
+
+const RATE_LIMIT = 60;
+const RATE_LIMIT_WINDOW = 60;
 
 const SPA_PREFIXES = ['/play', '/about', '/privacy'];
 
@@ -26,6 +30,46 @@ function requestOrigin(request: Request, url: URL): string {
   if (!host || host === url.host) return url.origin;
   const forwardedProtocol = request.headers.get('x-forwarded-proto');
   return `${forwardedProtocol ?? url.protocol.replace(':', '')}://${host}`;
+}
+
+function withRateLimit(headers: Record<string, string>): Record<string, string> {
+  return {
+    ...headers,
+    'RateLimit-Limit': String(RATE_LIMIT),
+    'RateLimit-Remaining': String(RATE_LIMIT - 1),
+    'RateLimit-Reset': String(RATE_LIMIT_WINDOW),
+  };
+}
+
+function wantsMarkdown(request: Request): boolean {
+  const accept = (request.headers.get('accept') || '').toLowerCase();
+  if (!accept.includes('text/markdown')) return false;
+  if (!accept.includes('text/html')) return true;
+  return accept.indexOf('text/markdown') < accept.indexOf('text/html');
+}
+
+function markdown404(pathname: string, origin: string, method: string): Response {
+  const body = `# 404 — Not Found
+
+\`${pathname}\` does not exist on ${origin}.
+
+## Where to look next
+
+- [Home](${origin}/)
+- [Play](${origin}/play)
+- [About](${origin}/about)
+- [Sitemap](${origin}/sitemap.xml)
+- [Agent catalog (JSON)](${origin}/api/ai)
+- [OpenAPI spec](${origin}/openapi.json)
+`;
+  return new Response(method === 'HEAD' ? null : body, {
+    status: 404,
+    headers: {
+      'Content-Type': 'text/markdown; charset=utf-8',
+      'Cache-Control': 'no-store',
+      'X-Content-Type-Options': 'nosniff',
+    },
+  });
 }
 
 const api = new Hono<{ Bindings: WorkerEnv }>();
@@ -55,7 +99,13 @@ export default {
 
     if (request.method === 'GET' && url.pathname === '/api/ai') {
       return Response.json(agentCatalog(origin), {
-        headers: { 'Cache-Control': 'public, max-age=300' },
+        headers: withRateLimit({ 'Cache-Control': 'public, max-age=300' }),
+      });
+    }
+
+    if (request.method === 'GET' && url.pathname === '/openapi.json') {
+      return Response.json(openApiSpec(origin), {
+        headers: withRateLimit({ 'Cache-Control': 'public, max-age=300' }),
       });
     }
 
@@ -141,6 +191,11 @@ export default {
 
     if (url.pathname === '/') {
       return env.ASSETS.fetch(new Request(new URL('/index.html', url), request));
+    }
+
+    // Agent-friendly 404: return markdown body when Accept: text/markdown.
+    if (assetResponse.status === 404 && wantsMarkdown(request)) {
+      return markdown404(url.pathname, origin, request.method);
     }
 
     return assetResponse;
