@@ -19,6 +19,9 @@ head_sampling_rate = 0.1
 [limits]
 cpu_ms = 30000
 
+[ai]
+binding = "AI"
+
 [vars]
 NODE_ENV = "production"
 BETTER_AUTH_URL = "https://historia.aliveville.com"

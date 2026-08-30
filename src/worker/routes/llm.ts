@@ -1,7 +1,9 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { generateText } from "ai";
 import { Hono } from "hono";
-import OpenAI from "openai";
+import { createWorkersAI } from "workers-ai-provider";
 
 import { buildAdvisorPrompt, buildDiplomacyPrompt, buildGameMasterPrompt } from "../../../lib/ai-prompts";
 import { LLMTimeoutError, withTimeout } from "../../../lib/llm-timeout";
@@ -11,7 +13,7 @@ import { parseAiTurnResponse } from "../../../lib/turn-parser";
 import type { WorkerEnv } from "../../../lib/worker-env";
 
 const DEFAULT_GEMINI_MODEL = "gemini-3-flash-preview";
-const DEFAULT_FREE_AI_MODEL = "openrouter-openai-gpt-oss-20b-free";
+const DEFAULT_WORKERS_AI_MODEL = "@cf/meta/llama-3.1-8b-instruct";
 const FALLBACK_GEMINI_MODELS = [
   "gemini-3-flash-preview",
   "gemini-2.5-flash",
@@ -27,8 +29,35 @@ const normalizeGeminiModel = (model: string | undefined) => {
 
 const normalizeFreeAiModel = (model: string | undefined) => {
   const trimmed = model?.trim();
-  return !trimmed || trimmed === "auto" ? DEFAULT_FREE_AI_MODEL : trimmed;
+  const configured = process.env.AI_MODEL?.trim();
+  if (!trimmed || trimmed === "auto") {
+    if (!configured) throw new Error("AI_MODEL is required for the direct free provider");
+    return configured;
+  }
+  return trimmed;
 };
+
+async function callOpenAICompatible({
+  name,
+  baseURL,
+  apiKey,
+  model,
+  prompt,
+}: {
+  name: string;
+  baseURL: string;
+  apiKey: string;
+  model: string;
+  prompt: string;
+}): Promise<string> {
+  const provider = createOpenAICompatible({ name, baseURL, apiKey });
+  const result = await generateText({
+    model: provider.chatModel(model),
+    prompt,
+    maxRetries: 0,
+  });
+  return result.text || "{}";
+}
 
 const isModelSelectionError = (error: unknown) => {
   const message = error instanceof Error ? error.message.toLowerCase() : "";
@@ -151,6 +180,7 @@ async function callProvider(
   prompt: string,
   config: { provider: string; apiKey: string; model: string },
   systemPrompt: string,
+  env: WorkerEnv,
 ): Promise<string> {
   switch (config.provider) {
     case "local": {
@@ -189,46 +219,52 @@ async function callProvider(
       return "{}";
     }
     case "free-ai": {
-      const gateway = new OpenAI({
-        apiKey:
-          config.apiKey ||
-          process.env.AI_GATEWAY_API_KEY ||
-          process.env.FREE_AI_API_KEY ||
-          "x",
-        baseURL:
-          process.env.FREE_AI_GATEWAY_URL ||
-          "https://free-ai-gateway.sarthakagrawal927.workers.dev/v1",
-        defaultHeaders: { "x-gateway-project-id": "open-historia" },
-      });
-      const freeAiCompletion = await gateway.chat.completions.create({
-        messages: [{ role: "system", content: prompt }],
+      if (env.AI) {
+        const configuredModel = config.model?.trim();
+        const model = configuredModel?.startsWith("@cf/")
+          ? configuredModel
+          : env.AI_MODEL?.startsWith("@cf/")
+            ? env.AI_MODEL
+            : DEFAULT_WORKERS_AI_MODEL;
+        const workersAi = createWorkersAI({ binding: env.AI });
+        const result = await generateText({
+          model: workersAi(model),
+          system: systemPrompt,
+          prompt,
+          maxRetries: 0,
+        });
+        return result.text || "{}";
+      }
+      const baseURL = process.env.AI_BASE_URL?.trim();
+      const apiKey = config.apiKey || process.env.AI_API_KEY?.trim();
+      if (!baseURL || !apiKey) {
+        throw new Error("AI_BASE_URL and AI_API_KEY are required for the direct free provider");
+      }
+      return callOpenAICompatible({
+        name: "open-historia-direct-free",
+        baseURL,
+        apiKey,
         model: normalizeFreeAiModel(config.model),
+        prompt,
       });
-      return freeAiCompletion.choices[0].message.content || "{}";
     }
     case "deepseek": {
-      const deepseek = new OpenAI({
+      return callOpenAICompatible({
+        name: "open-historia-deepseek",
         apiKey: config.apiKey,
         baseURL: "https://api.deepseek.com",
-      });
-      const completion = await deepseek.chat.completions.create({
-        messages: [{ role: "system", content: prompt }],
         model: config.model,
+        prompt,
       });
-      return completion.choices[0].message.content || "{}";
     }
     case "openai": {
-      const openai = new OpenAI({ apiKey: config.apiKey });
-      const isOSeries = config.model.startsWith("o");
-      const completion = await openai.chat.completions.create({
-        messages: [{ role: isOSeries ? "user" : "system", content: prompt }],
+      return callOpenAICompatible({
+        name: "open-historia-openai",
+        apiKey: config.apiKey,
+        baseURL: "https://api.openai.com/v1",
         model: config.model,
-        response_format:
-          config.model.includes("gpt-4o") || config.model.includes("o3")
-            ? { type: "json_object" }
-            : undefined,
+        prompt,
       });
-      return completion.choices[0].message.content || "{}";
     }
     case "anthropic": {
       const anthropic = new Anthropic({ apiKey: config.apiKey });
@@ -363,6 +399,7 @@ llm.post("/turn", async (c) => {
             systemPrompt,
             config,
             "You are a JSON-only response bot for a grand strategy game. Never explain your answer, only return valid JSON.",
+            c.env,
           ),
           config.provider,
         );
@@ -455,6 +492,7 @@ llm.post("/chat", async (c) => {
         prompt,
         config,
         "You are a JSON-only response bot for a grand strategy game's diplomacy system. Never explain your answer, only return valid JSON.",
+        c.env,
       ),
       config.provider,
     );
@@ -532,6 +570,7 @@ llm.post("/advisor", async (c) => {
         prompt,
         config,
         "You are a JSON-only response bot for a grand strategy game's advisor system. Never explain your answer, only return valid JSON.",
+        c.env,
       ),
       config.provider,
     );
