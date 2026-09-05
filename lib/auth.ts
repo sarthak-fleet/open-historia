@@ -3,6 +3,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 
 import { createDb, type DbEnv } from "./db";
 import * as schema from "./db/schema";
+import { createPing } from "./ping";
 
 export type AuthEnv = DbEnv & {
   BETTER_AUTH_SECRET?: string;
@@ -11,6 +12,8 @@ export type AuthEnv = DbEnv & {
   GOOGLE_CLIENT_ID?: string;
   GOOGLE_CLIENT_SECRET?: string;
   NODE_ENV?: string;
+  APP_HEALTH_INGEST_KEY?: string;
+  APP_HEALTH_ENVIRONMENT?: string;
 };
 
 export function createAuth(env: AuthEnv) {
@@ -25,6 +28,7 @@ export function createAuth(env: AuthEnv) {
   const googleClientSecret = env.GOOGLE_CLIENT_SECRET?.trim();
 
   const db = createDb(env);
+  const ping = createPing({ key: env.APP_HEALTH_INGEST_KEY, environment: env.APP_HEALTH_ENVIRONMENT });
 
   return betterAuth({
     baseURL:
@@ -42,6 +46,18 @@ export function createAuth(env: AuthEnv) {
         : {},
     session: {
       expiresIn: 60 * 60 * 24 * 30,
+    },
+    databaseHooks: {
+      user: {
+        create: {
+          after: async (newUser) => {
+            await ping("signup", {
+              title: newUser.email,
+              props: { id: newUser.id, name: newUser.name },
+            });
+          },
+        },
+      },
     },
     rateLimit: {
       enabled: false,
