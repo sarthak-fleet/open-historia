@@ -17,18 +17,18 @@ export const PUBLIC_ROUTES: ReadonlyArray<PublicRoute> = [
     path: '/',
     title: 'Open Historia — AI Grand Strategy Game',
     description:
-      'Command nations across human history with natural-language orders and an AI Game Master.',
+      'Play an experimental AI grand-strategy game with natural-language orders, persistent campaign memory, and 20+ scenarios.',
     heading: 'Rewrite history, one order at a time',
     summary:
-      'Open Historia is an open-source grand-strategy game where an AI Game Master adjudicates diplomacy, conflict, territory, and alternate timelines.',
+      'Open Historia is a playable, open-source grand-strategy experiment where an AI Game Master adjudicates diplomacy, conflict, territory, and alternate timelines.',
     sections: [
       {
         heading: 'Start playing',
         body: 'Choose a historical, modern, alternate, or fictional scenario, command a nation in plain English, and watch the map and timeline respond.',
       },
       {
-        heading: 'Public product boundary',
-        body: 'The public site explains the game, its playable entry point, and its privacy policy. Saved campaigns and player state remain private.',
+        heading: 'Current product boundary',
+        body: 'The natural-language turn loop, campaign memory, local saves, optional cloud saves, and timeline branching are playable. The map and campaign pacing remain prototype-grade, so the project is held rather than presented as a finished strategy game.',
       },
     ],
     schemaType: 'WebSite',
@@ -172,8 +172,7 @@ const MACHINE_SURFACES: ReadonlyArray<{
     path: '/api/ai',
     tag: 'agent-surfaces',
     summary: 'Agent catalog',
-    description:
-      'JSON inventory of all public agent surfaces, public routes, and exclusions.',
+    description: 'JSON inventory of all public agent surfaces, public routes, and exclusions.',
     responseDescription: 'Agent catalog JSON',
     contentType: 'application/json',
     schemaType: 'object',
