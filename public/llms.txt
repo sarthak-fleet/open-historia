@@ -4,7 +4,7 @@
 
 ## Public pages
 
-- [Rewrite history, one order at a time](https://historia.aliveville.com/index.md): Command nations across human history with natural-language orders and an AI Game Master.
+- [Rewrite history, one order at a time](https://historia.aliveville.com/index.md): Play an experimental AI grand-strategy game with natural-language orders, persistent campaign memory, and 20+ scenarios.
 - [Start an alternate history](https://historia.aliveville.com/play.md): Choose a scenario and command a civilization with natural-language orders in Open Historia.
 - [Steer history, one order at a time](https://historia.aliveville.com/about.md): Learn how Open Historia combines natural-language strategy, an AI rules engine, and rewindable timelines.
 - [Privacy](https://historia.aliveville.com/privacy.md): How Open Historia handles sign-in identity, private saves, provider requests, and deletion.

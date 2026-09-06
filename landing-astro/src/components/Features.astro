@@ -7,19 +7,19 @@ const FEATURES = [
   {
     n: 'I',
     t: 'Multi-provider AI',
-    b: 'Anthropic, OpenAI, Gemini, DeepSeek, or local. Bring your own key, pick your model per session.',
+    b: 'Use the keyless free option on the web, bring an Anthropic, OpenAI, Gemini, or DeepSeek key, or connect a local provider when self-hosting.',
     accent: 'amber',
   },
   {
     n: 'II',
-    t: 'Save & share',
-    b: 'Cloudflare-backed saves. Resume anywhere, share a campaign URL, fork a friend’s timeline.',
+    t: 'Save & resume',
+    b: 'Play without an account using local saves. Sign in only if you want private cloud saves that follow you across devices.',
     accent: 'emerald',
   },
   {
     n: 'III',
     t: 'Alternate history',
-    b: 'Rewind to any turn. Branch off. The Game Master rolls the world forward from your new decision.',
+    b: 'Rewind to an earlier turn and create a new branch. The Game Master rolls the world forward from your changed decision.',
     accent: 'rose',
   },
 ] as const;
@@ -28,7 +28,7 @@ const FEATURES = [
 <section class="oh-features">
   <div class="oh-eyebrow center">&middot;&nbsp; FEATURES &nbsp;&middot;</div>
   <h2 class="oh-h2 center">
-    Three building blocks. <em>Endless campaigns.</em>
+    The working loop. <em>Still an experiment.</em>
   </h2>
   <div class="oh-features-grid">
     {FEATURES.map((f) => (

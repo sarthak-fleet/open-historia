@@ -18,13 +18,16 @@ interface Props {
 const { title, description } = Astro.props;
 
 const SITE_URL = 'https://historia.aliveville.com';
-const OG_IMAGE = `${SITE_URL}/opengraph-image`;
+const OG_IMAGE = `${SITE_URL}/og.png`;
 const structuredData = JSON.stringify({
   '@context': 'https://schema.org',
-  '@type': 'WebSite',
+  '@type': 'VideoGame',
   name: 'Open Historia',
   description,
   url: `${SITE_URL}/`,
+  applicationCategory: 'Game',
+  gamePlatform: 'Web browser',
+  isAccessibleForFree: true,
 });
 ---
 
@@ -80,12 +83,14 @@ const structuredData = JSON.stringify({
       is:inline
       src="https://sassmaker.com/project-strip.js"
       data-project="open-historia"
+      crossorigin="anonymous"
       defer
     ></script>
     <script
       is:inline
       src="https://sassmaker.com/ai-chat-footer.js"
       data-name="Open Historia"
+      crossorigin="anonymous"
       defer
     ></script>
   </body>
